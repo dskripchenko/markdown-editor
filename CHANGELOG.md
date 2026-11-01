@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+### Patch Changes
+
+- aab3f9b: Works with `@dskripchenko/wysiwyg` 0.8 (code blocks highlighted by `@dskripchenko/syntax`, some 35 languages) as well as 0.7.
+
 ## 0.3.0
 
 ### Minor Changes
