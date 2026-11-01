@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- dc2c5a0: `image-base` without a scheme (`/media/`): pictures shown from it are saved back relative as well.
+
 ## 0.2.0
 
 ### Minor Changes
