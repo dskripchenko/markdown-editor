@@ -24,6 +24,10 @@ const props = withDefaults(defineProps<{
   slashCommands?: SlashCommands
   locale?: MarkdownEditorLocale
   labels?: Partial<MarkdownEditorLabels>
+  /** The folder relative pictures resolve against (a URL ending in `/`); saved back relative. */
+  imageBase?: string
+  /** The base of relative links in the preview. */
+  linkBase?: string
 }>(), {
   modelValue: '',
   modes: () => ['visual', 'source', 'split'],
@@ -36,6 +40,8 @@ const props = withDefaults(defineProps<{
   slashCommands: undefined,
   locale: undefined,
   labels: undefined,
+  imageBase: undefined,
+  linkBase: undefined,
 })
 
 const emit = defineEmits<{
@@ -49,15 +55,21 @@ const kitLocale = useLocale()
 const t = computed<MarkdownEditorLabels>(() => ({ ...labelsFor(props.locale ?? kitLocale.value.code), ...props.labels }))
 
 // The Markdown the editor stands on, and the HTML the visual mode edits.
+const options = computed(() => ({ imageBase: props.imageBase ?? null }))
 const markdown = ref(props.modelValue)
-const html = ref(fromMarkdown(props.modelValue))
+const html = ref(fromMarkdown(props.modelValue, options.value))
 const wysiwyg = ref<InstanceType<typeof DskWysiwyg> | null>(null)
 const area = ref<HTMLTextAreaElement | null>(null)
 
 watch(() => props.modelValue, (next) => {
   if (next === markdown.value) return
   markdown.value = next
-  html.value = fromMarkdown(next)
+  html.value = fromMarkdown(next, options.value)
+})
+
+// A new base (the document moved): draw the pictures from it.
+watch(() => props.imageBase, () => {
+  html.value = fromMarkdown(markdown.value, options.value)
 })
 
 function commit(next: string): void {
@@ -69,7 +81,7 @@ function commit(next: string): void {
 
 function onHtml(next: string): void {
   html.value = next
-  commit(toMarkdown(next))
+  commit(toMarkdown(next, options.value))
 }
 
 function onSource(event: Event): void {
@@ -79,7 +91,7 @@ function onSource(event: Event): void {
 function setMode(next: MarkdownEditorMode): void {
   if (next === mode.value) return
   // Back to the visual editor: it starts from the Markdown as it is now.
-  if (next === 'visual') html.value = fromMarkdown(markdown.value)
+  if (next === 'visual') html.value = fromMarkdown(markdown.value, options.value)
   mode.value = next
 }
 
@@ -94,7 +106,7 @@ function onPaste(event: ClipboardEvent): void {
   if (!text || !MARKDOWN_HINT.test(text)) return
   event.preventDefault()
   event.stopPropagation()
-  document.execCommand('insertHTML', false, fromMarkdown(text))
+  document.execCommand('insertHTML', false, fromMarkdown(text, options.value))
 }
 
 function onTab(event: KeyboardEvent): void {
@@ -115,7 +127,7 @@ function focus(): void {
 function insert(text: string): void {
   if (mode.value === 'visual') {
     focus()
-    document.execCommand('insertHTML', false, fromMarkdown(text))
+    document.execCommand('insertHTML', false, fromMarkdown(text, options.value))
     return
   }
   const el = area.value
@@ -197,6 +209,8 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         <UidMarkdown
           :source="markdown"
           :block-renderers="blockRenderers"
+          :image-base="imageBase"
+          :link-base="linkBase"
         />
       </div>
     </div>

@@ -45,6 +45,8 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 | `toolbar-items`, `slash-commands` | | Gehen an den WYSIWYG-Editor. |
 | `locale` | `'en' \| 'ru'` | Die Sprache; standardmäßig die Locale des Kits. |
 | `labels` | `object` | Einzelne Texte über denen der Sprache. |
+| `image-base` | `string` | Der Ordner (eine URL mit `/` am Ende), gegen den relative Bilder aufgelöst werden: `img/a.png` wird von dort gezeigt und wieder als `img/a.png` gespeichert, `../a.png` ebenso. |
+| `link-base` | `string` | Die Basis relativer Links in der Vorschau. |
 
 Ereignisse: `update:modelValue` und `change` mit dem Markdown — nur, wenn das
 Dokument bearbeitet wird, nie beim Laden. `update:mode`.
@@ -83,4 +85,6 @@ toMarkdown('<h1>Hallo</h1>')      // '# Hallo\n'
 normalize('* a\n* b')             // '- a\n- b\n' — ein Durchgang, wie beim Speichern
 ```
 
-`toMarkdown` braucht ein DOM (Browser oder jsdom).
+`toMarkdown` braucht ein DOM (Browser oder jsdom). Beide nehmen `{ imageBase }`:
+relative Bilder werden für die Anzeige aufgelöst und bei der Ausgabe wieder
+relativ.

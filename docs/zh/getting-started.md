@@ -45,6 +45,8 @@ const mode = ref('visual')
 | `toolbar-items`、`slash-commands` | | 传给所见即所得编辑器。 |
 | `locale` | `'en' \| 'ru'` | 语言；默认使用组件库的语言。 |
 | `labels` | `object` | 覆盖语言中的单个文本。 |
+| `image-base` | `string` | 相对图片解析所依据的文件夹（以 `/` 结尾的 URL）：`img/a.png` 从那里显示，并按 `img/a.png` 保存回去，`../a.png` 亦然。 |
+| `link-base` | `string` | 预览中相对链接的基准。 |
 
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 
@@ -75,4 +77,4 @@ toMarkdown('<h1>你好</h1>')      // '# 你好\n'
 normalize('* a\n* b')            // '- a\n- b\n'——一次往返，与保存时相同
 ```
 
-`toMarkdown` 需要 DOM（浏览器或 jsdom）。
+`toMarkdown` 需要 DOM（浏览器或 jsdom）。两者都接受 `{ imageBase }`：相对图片在显示时被解析，输出时再还原为相对路径。
