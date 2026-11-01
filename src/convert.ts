@@ -141,11 +141,13 @@ export interface ConvertOptions {
  * Anything else stays as it is.
  */
 export function relativeTo(url: string, base: string): string {
+  // A base without a scheme (`/media/`, `docs/`) is resolved on a placeholder origin, the URL against it.
+  const PLACEHOLDER = 'http://base.invalid/'
   let u: URL
   let b: URL
   try {
-    u = new URL(url)
-    b = new URL(base)
+    b = new URL(base, PLACEHOLDER)
+    u = new URL(url, b)
   } catch {
     return url
   }

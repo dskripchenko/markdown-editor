@@ -85,4 +85,11 @@ describe('pictures relative to the document', () => {
     expect(relativeTo('https://x.test/z.png', 'https://x.test/a/b/')).toBe('../../z.png')
     expect(relativeTo('https://y.test/a/c.png', 'https://x.test/a/')).toBe('https://y.test/a/c.png')
   })
+
+  it('takes a base without a scheme: a path from the site root', () => {
+    expect(relativeTo('/media/poster.jpg', '/media/')).toBe('poster.jpg')
+    expect(relativeTo('/up.png', '/media/')).toBe('../up.png')
+    const md = '![p](poster.jpg)\n'
+    expect(toMarkdown(fromMarkdown(md, { imageBase: '/media/' }), { imageBase: '/media/' })).toBe(md)
+  })
 })
