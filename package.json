@@ -1,6 +1,6 @@
 {
   "name": "@dskripchenko/markdown-editor",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A Markdown editor for Vue 3 that edits like a word processor: the value is Markdown, the editing is the @dskripchenko/wysiwyg engine — its toolbar, slash menu, shortcuts and live blocks — with source and side-by-side modes, and a lossless round trip",
   "keywords": [
     "markdown",
