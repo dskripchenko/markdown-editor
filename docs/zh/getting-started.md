@@ -38,6 +38,8 @@ const mode = ref('visual')
 | `v-model` | `string` | Markdown 内容。 |
 | `v-model:mode` | `'visual' \| 'source' \| 'split'` | 模式；默认 `visual`。 |
 | `modes` | `string[]` | 提供的模式；默认三种全部。 |
+| `modeSwitch` | `boolean` | 编辑器上方的模式按钮；宿主自行切换模式时设为 `false`（`v-model:mode`）。默认 `true`。 |
+| `toolbarTarget` | `string \| HTMLElement` | 可视模式工具栏的显示位置，代替文本上方：宿主自己的栏（元素或 CSS 选择器）。 |
 | `placeholder` | `string` | 文档为空时显示。 |
 | `readonly` | `boolean` | 所有模式下只读。 |
 | `min-height`、`max-height` | `string` | 编辑区高度。 |
