@@ -1,6 +1,6 @@
 export { default as MarkdownEditor } from './MarkdownEditor.vue'
 export type { MarkdownEditorMode } from './MarkdownEditor.vue'
-export { fromMarkdown, toMarkdown, normalize, splitBlocks, SOURCE_LANG } from './convert'
-export type { MarkdownBlock } from './convert'
+export { fromMarkdown, toMarkdown, normalize, splitBlocks, relativeTo, SOURCE_LANG } from './convert'
+export type { MarkdownBlock, ConvertOptions } from './convert'
 export { labelsFor, markdownEditorLocales } from './locale'
 export type { MarkdownEditorLabels, MarkdownEditorLocale } from './locale'

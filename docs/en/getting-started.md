@@ -45,6 +45,8 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `toolbar-items`, `slash-commands` | | Passed to the WYSIWYG editor. |
 | `locale` | `'en' \| 'ru'` | The language; by default the kit's locale. |
 | `labels` | `object` | Single strings over the language's own. |
+| `image-base` | `string` | The folder (a URL ending in `/`) relative pictures resolve against: `img/a.png` shows from there and is saved back as `img/a.png`, `../a.png` too. |
+| `link-base` | `string` | The base of relative links in the preview. |
 
 Events: `update:modelValue` and `change` with the Markdown — only when the
 document is edited, never on loading it. `update:mode`.
@@ -82,4 +84,5 @@ toMarkdown('<h1>Hi</h1>')      // '# Hi\n'
 normalize('* a\n* b')          // '- a\n- b\n' — one round, as saving gives
 ```
 
-`toMarkdown` needs a DOM (a browser or jsdom).
+`toMarkdown` needs a DOM (a browser or jsdom). Both take `{ imageBase }`: relative
+pictures resolved for display, and back to relative paths on the way out.

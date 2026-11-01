@@ -129,12 +129,43 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+/** Where the document's relative pictures resolve while it is edited. */
+export interface ConvertOptions {
+  /** A folder URL (ending in `/`): `img/a.png` shows as `<imageBase>img/a.png` and is saved back as `img/a.png`. */
+  imageBase?: string | null
+}
+
+/**
+ * A URL back to a path relative to `base`, when both share the origin:
+ * `<base>img/a.png` → `img/a.png`, `<base's parent>up.png` → `../up.png`.
+ * Anything else stays as it is.
+ */
+export function relativeTo(url: string, base: string): string {
+  let u: URL
+  let b: URL
+  try {
+    u = new URL(url)
+    b = new URL(base)
+  } catch {
+    return url
+  }
+  // By scheme and host: `origin` is "null" for schemes of an app's own (folio:, app:).
+  if (u.protocol !== b.protocol || u.host !== b.host) return url
+  const from = b.pathname.split('/').slice(0, -1)
+  const to = u.pathname.split('/')
+  let i = 0
+  while (i < from.length && i < to.length - 1 && from[i] === to[i]) i++
+  if (i === 0 && from.length > 1) return url
+  const rel = [...Array(from.length - i).fill('..'), ...to.slice(i)].join('/')
+  return decodeURI(rel) + u.search + u.hash
+}
+
 /** Markdown → the HTML the editor edits; source blocks become code blocks of {@link SOURCE_LANG}. */
-export function fromMarkdown(markdown: string): string {
+export function fromMarkdown(markdown: string, options: ConvertOptions = {}): string {
   const out: string[] = []
   let pending: string[] = []
   const flush = (): void => {
-    if (pending.length) out.push(renderMarkdown(pending.join('\n\n')))
+    if (pending.length) out.push(renderMarkdown(pending.join('\n\n'), options.imageBase ? { imageBase: options.imageBase } : {}))
     pending = []
   }
   for (const block of splitBlocks(markdown)) {
@@ -151,13 +182,20 @@ export function fromMarkdown(markdown: string): string {
 
 const SOURCE_FENCE = new RegExp(`^(\`{3,})${SOURCE_LANG}\\n([\\s\\S]*?)\\n\\1$`, 'gm')
 
-/** The editor's HTML → Markdown; source blocks come back as written. */
-export function toMarkdown(html: string): string {
-  const md = htmlToMarkdown(html).replace(SOURCE_FENCE, (_m, _fence: string, text: string) => text)
+/** The editor's HTML → Markdown; source blocks come back as written, pictures by their relative paths. */
+export function toMarkdown(html: string, options: ConvertOptions = {}): string {
+  const base = options.imageBase
+  const relative = base
+    ? html.replace(/(<img\b[^>]*?\ssrc=")([^"]*)(")/gi, (_m, head: string, src: string, tail: string) => {
+        const url = src.replace(/&amp;/g, '&')
+        return head + relativeTo(url, base).replace(/&/g, '&amp;') + tail
+      })
+    : html
+  const md = htmlToMarkdown(relative).replace(SOURCE_FENCE, (_m, _fence: string, text: string) => text)
   return md === '' ? '' : `${md}\n`
 }
 
 /** One round: what saving a document unchanged in the editor gives. */
-export function normalize(markdown: string): string {
-  return toMarkdown(fromMarkdown(markdown))
+export function normalize(markdown: string, options: ConvertOptions = {}): string {
+  return toMarkdown(fromMarkdown(markdown, options), options)
 }
