@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- 127c7b2: `image-base` and `link-base`: a document's relative pictures show from its folder in the visual editor and the preview and are saved back as written (`img/a.png`, `../a.png`); relative links of the preview resolve against `link-base`. `fromMarkdown`, `toMarkdown` and `normalize` take `{ imageBase }`; `relativeTo` is exported.
+
 ## 0.1.0
 
 ### Minor Changes
