@@ -38,6 +38,8 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `v-model` | `string` | The Markdown. |
 | `v-model:mode` | `'visual' \| 'source' \| 'split'` | The mode; `visual` by default. |
 | `modes` | `string[]` | The modes offered; all three by default. |
+| `modeSwitch` | `boolean` | The mode buttons above the editor; `false` when the host switches modes itself (`v-model:mode`). Default `true`. |
+| `toolbarTarget` | `string \| HTMLElement` | Where the visual mode's toolbar is shown instead of above the text: the host's own bar (an element or a CSS selector). |
 | `placeholder` | `string` | Shown while the document is empty. |
 | `readonly` | `boolean` | Read-only in every mode. |
 | `min-height`, `max-height` | `string` | The editing area's height. |

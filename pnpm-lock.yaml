@@ -15,8 +15,8 @@ importers:
         specifier: ^1.19.1
         version: 1.19.1(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
-        specifier: ^0.6.0
-        version: 0.6.0(@dskripchenko/ui@1.19.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: ^0.7.0
+        version: 0.7.0(@dskripchenko/ui@1.19.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
@@ -221,8 +221,8 @@ packages:
     peerDependencies:
       vue: ^3.4.0
 
-  '@dskripchenko/wysiwyg@0.6.0':
-    resolution: {integrity: sha512-rI5q3Rfh93H9rdHFRp4wXTuVpT+OCif43LX08aaTHoFUoQBDmfOgcdQue7x5aXRwBUhYReJptGjQ//VkxFvUPg==}
+  '@dskripchenko/wysiwyg@0.7.0':
+    resolution: {integrity: sha512-HGD30fW6kXhccYrHbYKXA//a8YaKM+/yvCRLq490eIzA6jUICzVacDzW8ufgq1JrMx06sKpc3I9rIlmZa9XdmA==}
     peerDependencies:
       '@dskripchenko/ui': ^1.0
       vue: ^3.4
@@ -1818,7 +1818,7 @@ snapshots:
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.6.0(@dskripchenko/ui@1.19.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.7.0(@dskripchenko/ui@1.19.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:

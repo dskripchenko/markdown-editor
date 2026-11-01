@@ -21,6 +21,10 @@ const props = withDefaults(defineProps<{
   maxHeight?: string
   blockRenderers?: BlockRenderers
   toolbarItems?: ToolbarItems
+  /** Where the visual mode's toolbar is shown instead of above the text (an element or a CSS selector): the host's own bar. */
+  toolbarTarget?: string | HTMLElement
+  /** The mode buttons above the editor; off when the host switches modes itself (`v-model:mode`). */
+  modeSwitch?: boolean
   slashCommands?: SlashCommands
   locale?: MarkdownEditorLocale
   labels?: Partial<MarkdownEditorLabels>
@@ -37,6 +41,8 @@ const props = withDefaults(defineProps<{
   maxHeight: undefined,
   blockRenderers: undefined,
   toolbarItems: undefined,
+  toolbarTarget: undefined,
+  modeSwitch: true,
   slashCommands: undefined,
   locale: undefined,
   labels: undefined,
@@ -147,7 +153,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
     :style="{ '--dsk-md-min-h': minHeight, '--dsk-md-max-h': maxHeight }"
   >
     <div
-      v-if="modes.length > 1"
+      v-if="modeSwitch && modes.length > 1"
       class="dsk-md__modes"
       role="group"
       :aria-label="t.modes"
@@ -180,6 +186,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         :max-height="maxHeight"
         :block-renderers="blockRenderers"
         :toolbar-items="toolbarItems"
+        :toolbar-target="toolbarTarget"
         :slash-commands="slashCommands"
         :locale="locale"
         @update:model-value="onHtml"

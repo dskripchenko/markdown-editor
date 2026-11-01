@@ -38,6 +38,8 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 | `v-model` | `string` | Das Markdown. |
 | `v-model:mode` | `'visual' \| 'source' \| 'split'` | Der Modus; standardmäßig `visual`. |
 | `modes` | `string[]` | Die angebotenen Modi; standardmäßig alle drei. |
+| `modeSwitch` | `boolean` | Die Modusknöpfe über dem Editor; `false`, wenn die Anwendung die Modi selbst umschaltet (`v-model:mode`). Standard `true`. |
+| `toolbarTarget` | `string \| HTMLElement` | Wo die Toolbar des visuellen Modus statt über dem Text erscheint: die eigene Leiste der Anwendung (ein Element oder ein CSS-Selektor). |
 | `placeholder` | `string` | Wird im leeren Dokument gezeigt. |
 | `readonly` | `boolean` | In allen Modi schreibgeschützt. |
 | `min-height`, `max-height` | `string` | Die Höhe des Bearbeitungsbereichs. |

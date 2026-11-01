@@ -38,6 +38,8 @@ const mode = ref('visual')
 | `v-model` | `string` | Markdown. |
 | `v-model:mode` | `'visual' \| 'source' \| 'split'` | Режим; по умолчанию `visual`. |
 | `modes` | `string[]` | Доступные режимы; по умолчанию все три. |
+| `modeSwitch` | `boolean` | Кнопки режимов над редактором; `false`, когда режимы переключает сама программа (`v-model:mode`). По умолчанию `true`. |
+| `toolbarTarget` | `string \| HTMLElement` | Где показывать тулбар визуального режима вместо места над текстом: собственная панель программы (элемент или CSS-селектор). |
 | `placeholder` | `string` | Подсказка в пустом документе. |
 | `readonly` | `boolean` | Только чтение во всех режимах. |
 | `min-height`, `max-height` | `string` | Высота области правки. |
