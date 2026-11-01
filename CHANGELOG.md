@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- 9eedfee: `toolbarTarget` shows the visual mode's toolbar in the host's own element (wysiwyg 0.7), and `modeSwitch: false` hides the mode buttons when the host switches modes itself through `v-model:mode`.
+
 ## 0.2.1
 
 ### Patch Changes
