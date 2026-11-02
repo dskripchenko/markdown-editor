@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { UidMarkdown, useLocale } from '@dskripchenko/ui'
+import { computed, h, nextTick, onBeforeUnmount, ref, watch, type VNode } from 'vue'
+import { tokenize, UidMarkdown, useLocale } from '@dskripchenko/ui'
 import { DskWysiwyg } from '@dskripchenko/wysiwyg'
 import { fromMarkdown, toMarkdown } from './convert'
 import { labelsFor, type MarkdownEditorLabels, type MarkdownEditorLocale } from './locale'
@@ -93,6 +93,49 @@ function onHtml(next: string): void {
 function onSource(event: Event): void {
   commit((event.target as HTMLTextAreaElement).value)
 }
+
+// The source highlighted: a copy of the text in colour over the field, the field's own
+// text transparent — its caret, selection and undo stay the browser's. The copy takes the
+// field's look as it is drawn, so a host that styles the field keeps its style.
+/** Past this size the source is plain: tokenizing it on every key would lag. */
+const HIGHLIGHT_LIMIT = 300_000
+const shade = ref<HTMLElement | null>(null)
+const highlighted = computed(() => markdown.value.length <= HIGHLIGHT_LIMIT)
+const Highlighted = (): (VNode | string)[] =>
+  tokenize(markdown.value + '\n', 'markdown').map((t) => (t.type === 'plain' ? t.text : h('span', { class: `uid-code__tok--${t.type}` }, t.text)))
+let observer: ResizeObserver | null = null
+
+function placeShade(): void {
+  const ta = area.value
+  const pre = shade.value
+  if (!ta || !pre) return
+  const s = getComputedStyle(ta)
+  for (const p of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'wordSpacing', 'tabSize', 'textIndent', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'] as const) pre.style[p] = s[p]
+  // The copy is as wide as the field's text area: its scrollbar takes width the copy must not use.
+  pre.style.left = `${ta.offsetLeft}px`
+  pre.style.top = `${ta.offsetTop}px`
+  pre.style.width = `${ta.clientWidth + parseFloat(s.borderLeftWidth) + parseFloat(s.borderRightWidth)}px`
+  pre.style.height = `${ta.clientHeight + parseFloat(s.borderTopWidth) + parseFloat(s.borderBottomWidth)}px`
+  pre.scrollTop = ta.scrollTop
+}
+
+function syncShade(): void {
+  if (shade.value && area.value) shade.value.scrollTop = area.value.scrollTop
+}
+
+watch([area, shade], ([ta]) => {
+  observer?.disconnect()
+  observer = null
+  if (!ta) return
+  // Where there is no layout (a test's DOM, server rendering), there is nothing to follow.
+  if (typeof ResizeObserver !== 'undefined') {
+    observer = new ResizeObserver(() => placeShade())
+    observer.observe(ta)
+  }
+  void nextTick(placeShade)
+})
+watch(markdown, () => void nextTick(syncShade))
+onBeforeUnmount(() => observer?.disconnect())
 
 function setMode(next: MarkdownEditorMode): void {
   if (next === mode.value) return
@@ -197,9 +240,16 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
       v-else
       class="dsk-md__panes"
     >
+      <pre
+        v-if="highlighted"
+        ref="shade"
+        class="dsk-md__shade"
+        aria-hidden="true"
+      ><Highlighted /></pre>
       <textarea
         ref="area"
         class="dsk-md__source"
+        :class="{ 'dsk-md__source--shaded': highlighted }"
         :value="markdown"
         :placeholder="placeholder"
         :readonly="readonly"
@@ -207,6 +257,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         spellcheck="false"
         @input="onSource"
         @keydown="onTab"
+        @scroll="syncShade"
       />
       <div
         v-if="mode === 'split'"

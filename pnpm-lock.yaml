@@ -12,11 +12,11 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       '@dskripchenko/ui':
-        specifier: ^1.24.0
-        version: 1.24.0(vue@3.5.44(typescript@6.0.3))
+        specifier: ^1.24.1
+        version: 1.24.1(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
-        specifier: ^0.8.0
-        version: 0.8.0(@dskripchenko/ui@1.24.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: ^0.8.1
+        version: 0.8.1(@dskripchenko/ui@1.24.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
@@ -219,14 +219,14 @@ packages:
     resolution: {integrity: sha512-IwbURY60JyHzZdYkzIOmmxHYi4VgJD5Md/j5Il7Mbot3q2ic/Rxad4U5eke2AqVIt4caPXoZAuqBttptQC/c2A==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/ui@1.24.0':
-    resolution: {integrity: sha512-KyCpiQneS5BLll4XLa6e+IKiirok6zJ3l6J6fpj5sp+gQznMwk/Y/gYUVeWTUuLDRcfhETfSwYpkVjfx4o8sWw==}
+  '@dskripchenko/ui@1.24.1':
+    resolution: {integrity: sha512-QSM0imF47MyIsxpVP1W1zTYgCbeDb7ZWZ/pw9NVI+cw6ksJ0q3+bN2kQpxY7cKfySwOKkcV/Sg5JJ6yTNDzGFw==}
     engines: {node: '>=20'}
     peerDependencies:
       vue: ^3.4.0
 
-  '@dskripchenko/wysiwyg@0.8.0':
-    resolution: {integrity: sha512-otX3z5d/PohKVAv9ZAQe+2dudC7dVXeS8gHuNvditqLTZYhfAFHklOjXhG5ob5lKCoEbLF1e9O0afxvnGgvzZA==}
+  '@dskripchenko/wysiwyg@0.8.1':
+    resolution: {integrity: sha512-n+JJRmD4iUpSALTfUHGlDrGq6JjPx48NrceHWG97MYsGrG+DZBUj1qDc7A4ryP2Nh2hDKOuKvn55h0FqqwiHNQ==}
     peerDependencies:
       '@dskripchenko/ui': ^1.0
       vue: ^3.4
@@ -1819,18 +1819,18 @@ snapshots:
 
   '@dskripchenko/syntax@0.3.2': {}
 
-  '@dskripchenko/ui@1.24.0(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/ui@1.24.1(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       '@dskripchenko/syntax': 0.3.2
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.8.0(@dskripchenko/ui@1.24.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.8.1(@dskripchenko/ui@1.24.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       '@dskripchenko/syntax': 0.3.2
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:
-      '@dskripchenko/ui': 1.24.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.24.1(vue@3.5.44(typescript@6.0.3))
 
   '@eslint-community/eslint-utils@4.10.1(eslint@10.14.0)':
     dependencies:
