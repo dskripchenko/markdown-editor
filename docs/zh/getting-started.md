@@ -49,6 +49,8 @@ const mode = ref('visual')
 | `labels` | `object` | 覆盖语言中的单个文本。 |
 | `image-base` | `string` | 相对图片解析所依据的文件夹（以 `/` 结尾的 URL）：`img/a.png` 从那里显示，并按 `img/a.png` 保存回去，`../a.png` 亦然。 |
 | `link-base` | `string` | 预览中相对链接的基准。 |
+| `linkSuggest` | `(query) => items` | 输入 `[[` 时提供的候选（内部链接）：`{ label, insert, detail? }[]` 或返回它们的 Promise；选中后写入 `[[insert]]`。未设置则不显示列表。 |
+| `saveImage` | `(file) => path` | 粘贴、拖放或通过工具栏图片按钮选择的图片：由宿主保存该 `File` 并返回 Markdown 中使用的路径（或其 Promise；`null` 表示跳过）；在光标处写入 `![名称](路径)`。未设置则不接受图片。 |
 
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 

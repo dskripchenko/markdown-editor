@@ -49,6 +49,8 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 | `labels` | `object` | Einzelne Texte über denen der Sprache. |
 | `image-base` | `string` | Der Ordner (eine URL mit `/` am Ende), gegen den relative Bilder aufgelöst werden: `img/a.png` wird von dort gezeigt und wieder als `img/a.png` gespeichert, `../a.png` ebenso. |
 | `link-base` | `string` | Die Basis relativer Links in der Vorschau. |
+| `linkSuggest` | `(query) => items` | Was `[[` beim Tippen anbietet (interne Links): `{ label, insert, detail? }[]` oder ein Promise davon; die Auswahl schreibt `[[insert]]`. Ohne: keine Liste. |
+| `saveImage` | `(file) => path` | Eingefügte, abgelegte oder mit der Bild-Schaltfläche gewählte Bilder: der Host speichert die `File` und gibt den Pfad für das Markdown zurück (oder ein Promise davon; `null` überspringt sie); an der Einfügemarke wird `![Name](Pfad)` geschrieben. Ohne: Bilder werden nicht angenommen. |
 
 Ereignisse: `update:modelValue` und `change` mit dem Markdown — nur, wenn das
 Dokument bearbeitet wird, nie beim Laden. `update:mode`.

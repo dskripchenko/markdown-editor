@@ -5,6 +5,7 @@ import { DskWysiwyg } from '@dskripchenko/wysiwyg'
 import { fromMarkdown, toMarkdown } from './convert'
 import { labelsFor, type MarkdownEditorLabels, type MarkdownEditorLocale } from './locale'
 import { useLinkSuggest, type LinkSuggest } from './linkSuggest'
+import { carriesFiles, imageFiles, imageMarkdown, type SaveImage } from './images'
 import './style.css'
 
 export type MarkdownEditorMode = 'visual' | 'source' | 'split'
@@ -35,6 +36,8 @@ const props = withDefaults(defineProps<{
   linkBase?: string
   /** What `[[` offers to link to, as it is typed (internal links); none: no list. */
   linkSuggest?: LinkSuggest
+  /** Saves a picture pasted, dropped or chosen with the image button; gives its path for the Markdown. None: pictures are not taken. */
+  saveImage?: SaveImage
 }>(), {
   modelValue: '',
   modes: () => ['visual', 'source', 'split'],
@@ -52,6 +55,7 @@ const props = withDefaults(defineProps<{
   imageBase: undefined,
   linkBase: undefined,
   linkSuggest: undefined,
+  saveImage: undefined,
 })
 
 const emit = defineEmits<{
@@ -160,6 +164,7 @@ function setMode(next: MarkdownEditorMode): void {
 const MARKDOWN_HINT = /(^|\n)\s{0,3}(#{1,6}\s|[-*+]\s|\d+[.)]\s|>|```|~~~|\|.*\|)|\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)|`[^`]+`/
 
 function onPaste(event: ClipboardEvent): void {
+  if (takeImages(event, event.clipboardData)) return
   if (props.readonly || mode.value !== 'visual') return
   const data = event.clipboardData
   if (!data || data.types.includes('text/html')) return
@@ -168,6 +173,78 @@ function onPaste(event: ClipboardEvent): void {
   event.preventDefault()
   event.stopPropagation()
   document.execCommand('insertHTML', false, fromMarkdown(text, options.value))
+}
+
+/** Pictures in a paste or a drop: saved by the host and written where the caret is. True when taken. */
+function takeImages(event: Event, data: DataTransfer | null): boolean {
+  if (props.readonly || !props.saveImage) return false
+  const files = imageFiles(data)
+  if (files.length === 0) return false
+  event.preventDefault()
+  event.stopPropagation()
+  void addImages(files)
+  return true
+}
+
+function onDragOver(event: DragEvent): void {
+  if (props.readonly || !props.saveImage || !carriesFiles(event.dataTransfer)) return
+  event.preventDefault()
+  if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
+}
+
+function onDrop(event: DragEvent): void {
+  if (props.readonly || !props.saveImage || imageFiles(event.dataTransfer).length === 0) return
+  // The caret where the pictures were dropped (in the source, where the browser can tell).
+  if (mode.value === 'visual') {
+    const range = document.caretRangeFromPoint?.(event.clientX, event.clientY)
+    const sel = window.getSelection()
+    if (range && sel) {
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  } else if (area.value) {
+    const at = document.caretPositionFromPoint?.(event.clientX, event.clientY)
+    if (at && at.offsetNode === area.value) area.value.setSelectionRange(at.offset, at.offset)
+  }
+  takeImages(event, event.dataTransfer)
+}
+
+/** The toolbar's image button: the pictures chosen from the disk. */
+function pickImages(): void {
+  if (props.readonly || !props.saveImage) return
+  const sel = window.getSelection()
+  const kept = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.multiple = true
+  input.addEventListener('change', () => {
+    const files = Array.from(input.files ?? [])
+    if (files.length === 0) return
+    if (kept && sel) {
+      sel.removeAllRanges()
+      sel.addRange(kept)
+    }
+    void addImages(files)
+  })
+  input.click()
+}
+
+async function addImages(files: File[]): Promise<void> {
+  const written: string[] = []
+  for (const file of files) {
+    const path = await props.saveImage?.(file)
+    if (path) written.push(imageMarkdown(file, path))
+  }
+  if (written.length === 0) return
+  if (mode.value !== 'visual') {
+    insert(written.join('\n'))
+    return
+  }
+  // Into the paragraph at the caret, not as a paragraph of its own.
+  wysiwyg.value?.controller?.chain().focus().run()
+  const html = written.map((md) => fromMarkdown(md, options.value).replace(/^<p>([\s\S]*)<\/p>\s*$/, '$1')).join('<br>')
+  document.execCommand('insertHTML', false, html)
 }
 
 function onTab(event: KeyboardEvent): void {
@@ -232,6 +309,8 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
       class="dsk-md__visual"
       :data-source-label="t.sourceBlock"
       @paste.capture="onPaste"
+      @dragover.capture="onDragOver"
+      @drop.capture="onDrop"
       @input="onVisualInput"
       @keydown.capture="links.key"
       @focusout="links.close"
@@ -249,6 +328,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         :slash-commands="slashCommands"
         :locale="locale"
         @update:model-value="onHtml"
+        @image-request="pickImages"
       />
     </div>
 
@@ -275,6 +355,9 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         @keydown="onTab"
         @scroll="syncShade"
         @blur="links.close"
+        @paste="onPaste"
+        @dragover="onDragOver"
+        @drop="onDrop"
       />
       <div
         v-if="mode === 'split'"
