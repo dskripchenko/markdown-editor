@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- 4428953: A YAML front matter at the document's start is kept as written (it used to be read as rules and a paragraph); `#tags` shown as tags with `@dskripchenko/wysiwyg` 0.11 (now allowed as a peer).
+
 ## 0.7.0
 
 ### Minor Changes
