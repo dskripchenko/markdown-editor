@@ -85,6 +85,29 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.keyboard.type('\n## From the source\n')
     await page.waitForTimeout(200)
     check(`${name}: typing in the source changes the value`, (await value()).includes('## From the source'))
+    // The source in colour: the copy over the field holds the same text, in tokens, in the same place.
+    const shade = page.locator('#editor .dsk-md__shade')
+    const same = await page.evaluate(() => {
+      const ta = document.querySelector('#editor .dsk-md__source')
+      const pre = document.querySelector('#editor .dsk-md__shade')
+      const a = ta.getBoundingClientRect()
+      const b = pre.getBoundingClientRect()
+      return { text: pre.textContent === ta.value + '\n', left: Math.abs(a.left - b.left), top: Math.abs(a.top - b.top), heading: pre.querySelectorAll('.uid-code__tok--heading').length, color: getComputedStyle(ta).color }
+    })
+    check(`${name}: the source is highlighted, the copy holds the text`, same.text && same.heading > 0, JSON.stringify(same))
+    check(`${name}: the copy lies over the field`, same.left < 1 && same.top < 1 && same.color === 'rgba(0, 0, 0, 0)', JSON.stringify(same))
+    if (name === 'chromium') await page.locator('#editor .dsk-md__panes').screenshot({ path: join(output, 'source.png') })
+    // Scrolled together.
+    await area.evaluate((el) => {
+      el.style.height = '160px'
+      el.scrollTop = 200
+      el.dispatchEvent(new Event('scroll'))
+    })
+    await page.waitForTimeout(150)
+    const scrolls = await page.evaluate(() => [document.querySelector('#editor .dsk-md__source').scrollTop, document.querySelector('#editor .dsk-md__shade').scrollTop])
+    check(`${name}: the copy scrolls with the field`, scrolls[0] > 0 && Math.abs(scrolls[0] - scrolls[1]) < 1, scrolls.join(','))
+    await area.evaluate((el) => (el.style.height = ''))
+    void shade
     await page.locator('#editor .dsk-md__mode').nth(2).click()
     check(`${name}: side by side shows the preview`, (await page.locator('#editor .dsk-md__preview h2', { hasText: 'From the source' }).count()) === 1)
     await page.locator('#editor .dsk-md__mode').nth(0).click()

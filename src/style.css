@@ -43,6 +43,7 @@
 }
 
 .dsk-md__panes {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--uid-space-md, 12px);
@@ -96,3 +97,47 @@
   border-left: 3px solid var(--uid-color-warning, #d97706);
 }
 
+
+/* The source in colour: a copy over the field, which shows only its caret and selection. */
+.dsk-md__shade {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden;
+  border-style: solid;
+  border-color: transparent;
+  background: transparent;
+  color: var(--uid-color-text, #111827);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  pointer-events: none;
+  --uid-code-tok-comment: var(--uid-text-secondary, #6b7280);
+  --uid-code-tok-string: var(--uid-success, #15803d);
+  --uid-code-tok-number: var(--uid-warning, #b45309);
+  --uid-code-tok-literal: var(--uid-warning, #b45309);
+  --uid-code-tok-keyword: var(--uid-accent-text, #1d4ed8);
+  --uid-code-tok-function: var(--uid-info, #0369a1);
+  --uid-code-tok-variable: var(--uid-danger, #b91c1c);
+  --uid-code-tok-tag: var(--uid-danger, #b91c1c);
+  --uid-code-tok-attr: var(--uid-warning, #b45309);
+  --uid-code-tok-property: var(--uid-info, #0369a1);
+  --uid-code-tok-punctuation: var(--uid-text-secondary, #6b7280);
+  --uid-code-tok-type: var(--uid-info, #0369a1);
+  --uid-code-tok-regex: var(--uid-success, #15803d);
+  --uid-code-tok-meta: var(--uid-text-secondary, #6b7280);
+  --uid-code-tok-inserted: var(--uid-success, #15803d);
+  --uid-code-tok-deleted: var(--uid-danger, #b91c1c);
+}
+
+.dsk-md__source.dsk-md__source--shaded {
+  color: transparent !important;
+  caret-color: var(--uid-color-text, #111827);
+}
+
+.dsk-md__source--shaded::selection {
+  color: transparent;
+  background: color-mix(in srgb, var(--uid-accent, #3b82f6) 28%, transparent);
+}
+
+.dsk-md__shade .uid-code__tok--heading { font-weight: 700; }
