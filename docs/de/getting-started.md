@@ -52,6 +52,8 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 | `linkSuggest` | `(query) => items` | Was `[[` beim Tippen anbietet (interne Links): `{ label, insert, detail? }[]` oder ein Promise davon; die Auswahl schreibt `[[insert]]`. Ohne: keine Liste. |
 | `saveImage` | `(file) => path` | Eingefügte, abgelegte oder mit der Bild-Schaltfläche gewählte Bilder: der Host speichert die `File` und gibt den Pfad für das Markdown zurück (oder ein Promise davon; `null` überspringt sie); an der Einfügemarke wird `![Name](Pfad)` geschrieben. Ohne: Bilder werden nicht angenommen. |
 
+TeX-Formeln (`$…$`, `$$…$$`) und `==Hervorhebungen==` erscheinen im visuellen Modus gezeichnet (mit `@dskripchenko/ui` 1.26 und `@dskripchenko/wysiwyg` 0.10 oder neuer): eine Formel ist ein Stück — ein Doppelklick bearbeitet ihr TeX, **Formel** im Slash-Menü fügt eine ein — und das Markdown behält sie wie geschrieben; in der Quelle wird ihr TeX hervorgehoben.
+
 Ereignisse: `update:modelValue` und `change` mit dem Markdown — nur, wenn das
 Dokument bearbeitet wird, nie beim Laden. `update:mode`.
 

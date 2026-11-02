@@ -53,6 +53,15 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.waitForTimeout(300)
     check(`${name}: loading the editor does not change the value`, (await value()) === sample)
     check(`${name}: what the editor cannot hold is shown as written`, (await page.locator('#editor pre code.language-x-markdown').count()) === 3)
+    // Formulas: islands drawn as MathML, a highlight as <mark>; their Markdown unchanged by loading (checked above).
+    const islands = await page.evaluate(() => [...document.querySelectorAll('#editor [contenteditable] span[data-math]')].map((el) => ({ tex: el.getAttribute('data-math'), display: el.getAttribute('data-display'), drawn: !!el.querySelector('math'), editable: el.getAttribute('contenteditable'), height: el.getBoundingClientRect().height })))
+    check(`${name}: formulas are islands drawn as MathML`, islands.length === 2 && islands.every((i) => i.drawn && i.editable === 'false' && i.height > 8) && islands[1].display === 'block', JSON.stringify(islands))
+    check(`${name}: a highlight is a mark`, (await page.locator('#editor [contenteditable] mark', { hasText: 'in force from Monday' }).count()) === 1)
+    // A double click on a formula asks for its TeX; the answer is written back.
+    page.once('dialog', (d) => d.accept('g = a \\cdot 0.005'))
+    await page.locator('#editor [contenteditable] span[data-math]').first().dblclick()
+    await page.waitForTimeout(300)
+    check(`${name}: a formula's TeX edited by a double click`, (await value()).includes('The fee is $g = a \\cdot 0.005$'), (await value()).match(/The fee is[^\n]*/)?.[0])
 
     // Typing at the end of the first paragraph, with bold by the shortcut.
     const mod = name === 'webkit' || process.platform === 'darwin' ? 'Meta' : 'Control'
@@ -102,6 +111,8 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
       return { text: pre.textContent === ta.value + '\n', left: Math.abs(a.left - b.left), top: Math.abs(a.top - b.top), heading: pre.querySelectorAll('.uid-code__tok--heading').length, color: getComputedStyle(ta).color }
     })
     check(`${name}: the source is highlighted, the copy holds the text`, same.text && same.heading > 0, JSON.stringify(same))
+    const texTokens = await page.evaluate(() => [...document.querySelectorAll('#editor .dsk-md__shade .uid-code__tok--keyword')].map((t) => t.textContent))
+    check(`${name}: TeX in the source is highlighted`, texTokens.includes('\\sum') && texTokens.includes('\\frac'), JSON.stringify(texTokens.slice(0, 8)))
     check(`${name}: the copy lies over the field`, same.left < 1 && same.top < 1 && same.color === 'rgba(0, 0, 0, 0)', JSON.stringify(same))
     if (name === 'chromium') await page.locator('#editor .dsk-md__panes').screenshot({ path: join(output, 'source.png') })
     // Scrolled together.
@@ -138,7 +149,7 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     check(`${name}: Enter writes the link in the source`, (await value()).includes('See [[Road map]]') && (await page.locator('.dsk-md__suggest').count()) === 0, (await value()).slice(-40))
     await page.locator('#editor .dsk-md__mode').nth(0).click()
     await page.waitForSelector('#editor [contenteditable="true"]')
-    const last = page.locator('#editor [contenteditable] p').last()
+    const last = page.locator('#editor [contenteditable] p', { hasText: 'Road map' }).last()
     await last.click()
     await page.keyboard.press('End')
     await page.keyboard.type(' and [[pl')

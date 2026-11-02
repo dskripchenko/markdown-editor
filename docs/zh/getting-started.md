@@ -52,6 +52,8 @@ const mode = ref('visual')
 | `linkSuggest` | `(query) => items` | 输入 `[[` 时提供的候选（内部链接）：`{ label, insert, detail? }[]` 或返回它们的 Promise；选中后写入 `[[insert]]`。未设置则不显示列表。 |
 | `saveImage` | `(file) => path` | 粘贴、拖放或通过工具栏图片按钮选择的图片：由宿主保存该 `File` 并返回 Markdown 中使用的路径（或其 Promise；`null` 表示跳过）；在光标处写入 `![名称](路径)`。未设置则不接受图片。 |
 
+TeX 公式（`$…$`、`$$…$$`）和 `==高亮==` 在可视模式下以渲染后的形式显示（需要 `@dskripchenko/ui` 1.26 和 `@dskripchenko/wysiwyg` 0.10 或更高版本）：公式是一个整体——双击可编辑其 TeX，斜杠菜单中的**公式**可插入新公式——Markdown 按原样保存；源码中的 TeX 会被高亮。
+
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 
 对外提供：`focus()`、`insert(markdown)`（插入到光标处；可视模式下已格式化）、`value`。
