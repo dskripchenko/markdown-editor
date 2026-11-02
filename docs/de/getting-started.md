@@ -54,6 +54,8 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 
 TeX-Formeln (`$…$`, `$$…$$`) und `==Hervorhebungen==` erscheinen im visuellen Modus gezeichnet (mit `@dskripchenko/ui` 1.26 und `@dskripchenko/wysiwyg` 0.10 oder neuer): eine Formel ist ein Stück — ein Doppelklick bearbeitet ihr TeX, **Formel** im Slash-Menü fügt eine ein — und das Markdown behält sie wie geschrieben; in der Quelle wird ihr TeX hervorgehoben.
 
+Ein YAML-Front-Matter am Anfang (die Eigenschaften des Dokuments) bleibt genau wie geschrieben; `#Tags` erscheinen im visuellen Modus als Tags (mit `@dskripchenko/ui` 1.27 und `@dskripchenko/wysiwyg` 0.11).
+
 Ereignisse: `update:modelValue` und `change` mit dem Markdown — nur, wenn das
 Dokument bearbeitet wird, nie beim Laden. `update:mode`.
 

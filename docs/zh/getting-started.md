@@ -54,6 +54,8 @@ const mode = ref('visual')
 
 TeX 公式（`$…$`、`$$…$$`）和 `==高亮==` 在可视模式下以渲染后的形式显示（需要 `@dskripchenko/ui` 1.26 和 `@dskripchenko/wysiwyg` 0.10 或更高版本）：公式是一个整体——双击可编辑其 TeX，斜杠菜单中的**公式**可插入新公式——Markdown 按原样保存；源码中的 TeX 会被高亮。
 
+文档开头的 YAML front matter（文档属性）按原样保存；`#标签` 在可视模式下显示为标签（需要 `@dskripchenko/ui` 1.27 和 `@dskripchenko/wysiwyg` 0.11）。
+
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 
 对外提供：`focus()`、`insert(markdown)`（插入到光标处；可视模式下已格式化）、`value`。

@@ -3,7 +3,12 @@ import '@dskripchenko/ui/styles/all.css'
 import '@dskripchenko/wysiwyg/style.css'
 import { MarkdownEditor, type MarkdownEditorMode } from '../src'
 
-const SAMPLE = `# Release notes
+const SAMPLE = `---
+title: Release notes
+tags: [payments, release]
+---
+
+# Release notes
 
 Version **3.1** of the payment platform — see the [changelog](https://example.com/changelog "Changelog").
 
@@ -18,7 +23,7 @@ Version **3.1** of the payment platform — see the [changelog](https://example.
 | Card | 1.9% |
 | QR | 0.4% |
 
-The fee is $f = a \\cdot 0.004$ — ==in force from Monday==; prices from $5 to $10 stay text.
+The fee is $f = a \\cdot 0.004$ — ==in force from Monday== #pricing; prices from $5 to $10 stay text.
 
 $$
 \\sum_{i=1}^{n} f_i = \\frac{n(n+1)}{2}

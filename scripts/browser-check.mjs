@@ -52,11 +52,12 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     const sample = await value()
     await page.waitForTimeout(300)
     check(`${name}: loading the editor does not change the value`, (await value()) === sample)
-    check(`${name}: what the editor cannot hold is shown as written`, (await page.locator('#editor pre code.language-x-markdown').count()) === 3)
+    check(`${name}: what the editor cannot hold is shown as written`, (await page.locator('#editor pre code.language-x-markdown').count()) === 4)
     // Formulas: islands drawn as MathML, a highlight as <mark>; their Markdown unchanged by loading (checked above).
     const islands = await page.evaluate(() => [...document.querySelectorAll('#editor [contenteditable] span[data-math]')].map((el) => ({ tex: el.getAttribute('data-math'), display: el.getAttribute('data-display'), drawn: !!el.querySelector('math'), editable: el.getAttribute('contenteditable'), height: el.getBoundingClientRect().height })))
     check(`${name}: formulas are islands drawn as MathML`, islands.length === 2 && islands.every((i) => i.drawn && i.editable === 'false' && i.height > 8) && islands[1].display === 'block', JSON.stringify(islands))
     check(`${name}: a highlight is a mark`, (await page.locator('#editor [contenteditable] mark', { hasText: 'in force from Monday' }).count()) === 1)
+    check(`${name}: a tag is a chip; the front matter is kept as written`, (await page.locator('#editor [contenteditable] .uid-markdown__tag[data-tag="pricing"]').count()) === 1 && (await page.locator('#editor pre code.language-x-markdown', { hasText: 'tags: [payments, release]' }).count()) === 1)
     // A double click on a formula asks for its TeX; the answer is written back.
     page.once('dialog', (d) => d.accept('g = a \\cdot 0.005'))
     await page.locator('#editor [contenteditable] span[data-math]').first().dblclick()

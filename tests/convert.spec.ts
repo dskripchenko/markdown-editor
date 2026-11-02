@@ -93,3 +93,15 @@ describe('pictures relative to the document', () => {
     expect(toMarkdown(fromMarkdown(md, { imageBase: '/media/' }), { imageBase: '/media/' })).toBe(md)
   })
 })
+
+describe('the document\u2019s properties', () => {
+  it('a front matter at the very start is kept as written; --- later is a rule', () => {
+    const md = '---\ntitle: Plan\ntags: [work]\n---\n\n# Plan\n\n---\n\ntext'
+    expect(splitBlocks(md).map((b) => `${b.kind}:${b.text.split('\n')[0]}`)).toEqual(['source:---', 'markdown:# Plan', 'markdown:---', 'markdown:text'])
+    expect(splitBlocks(md)[0]!.text).toBe('---\ntitle: Plan\ntags: [work]\n---')
+  })
+
+  it('an unclosed opening line is not a front matter', () => {
+    expect(splitBlocks('---\ntitle: x')[0]!.kind).toBe('markdown')
+  })
+})
