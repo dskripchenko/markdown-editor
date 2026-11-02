@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- b660289: TeX math and `==highlights==`: drawn in the visual mode with `@dskripchenko/ui` 1.26 and `@dskripchenko/wysiwyg` 0.10 (now allowed as a peer) — a formula is one piece, edited by a double click — and highlighted in the source.
+
 ## 0.6.0
 
 ### Minor Changes
