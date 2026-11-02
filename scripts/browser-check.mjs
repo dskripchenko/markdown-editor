@@ -2,6 +2,7 @@
 // ways jsdom does not model — typing, shortcuts, pasting, the caret — so the
 // round trip is checked where it happens. Builds the playground into
 // tests/browser/site, serves it, drives it with Playwright.
+import { Buffer } from 'node:buffer'
 import { createServer } from 'node:http'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join, extname } from 'node:path'
