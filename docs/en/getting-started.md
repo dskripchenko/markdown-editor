@@ -52,6 +52,8 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `linkSuggest` | `(query) => items` | What `[[` offers as it is typed (internal links): `{ label, insert, detail? }[]` or a promise of them; a choice writes `[[insert]]`. None: no list. |
 | `saveImage` | `(file) => path` | Pictures pasted, dropped or chosen with the toolbar's image button: the host saves the `File` and returns the path for the Markdown (or a promise of it; `null` skips it); `![name](path)` is written at the caret. None: pictures are not taken. |
 
+TeX math (`$…$`, `$$…$$`) and `==highlights==` are shown drawn in the visual mode (with `@dskripchenko/ui` 1.26 and `@dskripchenko/wysiwyg` 0.10 or later): a formula is one piece — a double click edits its TeX, the slash menu's **Formula** inserts one — and the Markdown keeps it as written; the source highlights its TeX.
+
 Events: `update:modelValue` and `change` with the Markdown — only when the
 document is edited, never on loading it. `update:mode`.
 

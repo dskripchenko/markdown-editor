@@ -18,6 +18,12 @@ Version **3.1** of the payment platform — see the [changelog](https://example.
 | Card | 1.9% |
 | QR | 0.4% |
 
+The fee is $f = a \\cdot 0.004$ — ==in force from Monday==; prices from $5 to $10 stay text.
+
+$$
+\\sum_{i=1}^{n} f_i = \\frac{n(n+1)}{2}
+$$
+
 \`\`\`js
 const fee = amount * 0.004
 \`\`\`

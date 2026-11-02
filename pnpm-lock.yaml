@@ -12,11 +12,11 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       '@dskripchenko/ui':
-        specifier: ^1.25.0
-        version: 1.25.0(vue@3.5.44(typescript@6.0.3))
+        specifier: ^1.26.1
+        version: 1.26.1(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
-        specifier: ^0.9.0
-        version: 0.9.0(@dskripchenko/ui@1.25.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: ^0.10.1
+        version: 0.10.1(@dskripchenko/ui@1.26.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
@@ -215,18 +215,22 @@ packages:
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
 
-  '@dskripchenko/syntax@0.3.2':
-    resolution: {integrity: sha512-IwbURY60JyHzZdYkzIOmmxHYi4VgJD5Md/j5Il7Mbot3q2ic/Rxad4U5eke2AqVIt4caPXoZAuqBttptQC/c2A==}
+  '@dskripchenko/math@0.1.0':
+    resolution: {integrity: sha512-M87c5BAvDsYRZviaXHFkQWK/0a++xkVbidB+loqS5cHTXIyyD5yoHLMHFDqMLlLEyvMOOuJeMRPRjvoYyiilRw==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/ui@1.25.0':
-    resolution: {integrity: sha512-G3VXZXlKvX44+Tm+HEk3yuHKE+WG60NgmYneSj1T3cneDoN1fkdznW+ci7YqPJGi2wIt5JqgGRC5GzQyWEEntQ==}
+  '@dskripchenko/syntax@0.4.0':
+    resolution: {integrity: sha512-lFTs/clUITCvIW1upZf+Vyfv5cCDK/lTF4X3Ttr7KhwQ+rA3A6Iv8j6Ye4c/esEQNF+3JKiVk5aB7WlrkzjB1A==}
+    engines: {node: '>=20'}
+
+  '@dskripchenko/ui@1.26.1':
+    resolution: {integrity: sha512-p9Zr56dJnWpCgSBsbG0NpROIxdLtoO58leSDNco13343NUXIXmzGRm96kQLHgMKy+vQ1yb/9U3MWFUWwo7MwEg==}
     engines: {node: '>=20'}
     peerDependencies:
       vue: ^3.4.0
 
-  '@dskripchenko/wysiwyg@0.9.0':
-    resolution: {integrity: sha512-3O0sM5lCrORBPDKSSNVHBQxjr0p3tJSU5G9SV3vXtXAOEKU/s7i4ul2Y3N56rwrMCRqD4IUfz4LOxqu/uOYCZQ==}
+  '@dskripchenko/wysiwyg@0.10.1':
+    resolution: {integrity: sha512-FP/GuYatwxt0voyDvSFIxYgc/vdeWTuGDskeV/r2vS42fTEkeAW/PO4KvDWJsDvE/xHr7W4nvZXZ7TCnrT978A==}
     peerDependencies:
       '@dskripchenko/ui': ^1.0
       vue: ^3.4
@@ -1817,20 +1821,24 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@dskripchenko/syntax@0.3.2': {}
+  '@dskripchenko/math@0.1.0': {}
 
-  '@dskripchenko/ui@1.25.0(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/syntax@0.4.0': {}
+
+  '@dskripchenko/ui@1.26.1(vue@3.5.44(typescript@6.0.3))':
     dependencies:
-      '@dskripchenko/syntax': 0.3.2
+      '@dskripchenko/math': 0.1.0
+      '@dskripchenko/syntax': 0.4.0
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.9.0(@dskripchenko/ui@1.25.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.10.1(@dskripchenko/ui@1.26.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
-      '@dskripchenko/syntax': 0.3.2
+      '@dskripchenko/math': 0.1.0
+      '@dskripchenko/syntax': 0.4.0
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:
-      '@dskripchenko/ui': 1.25.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.26.1(vue@3.5.44(typescript@6.0.3))
 
   '@eslint-community/eslint-utils@4.10.1(eslint@10.14.0)':
     dependencies:
