@@ -2,6 +2,7 @@
 // ways jsdom does not model — typing, shortcuts, pasting, the caret — so the
 // round trip is checked where it happens. Builds the playground into
 // tests/browser/site, serves it, drives it with Playwright.
+import { Buffer } from 'node:buffer'
 import { createServer } from 'node:http'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join, extname } from 'node:path'
@@ -15,7 +16,13 @@ mkdirSync(output, { recursive: true })
 execSync('npx vite build --config playground/vite.config.ts', { cwd: root, stdio: 'ignore' })
 
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2' }
+// The pictures the playground "saves": any name under pictures/ is a 1×1 PNG.
+const PIXEL = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==', 'base64')
 const server = createServer((req, res) => {
+  if (new URL(req.url, 'http://x').pathname.startsWith('/pictures/')) {
+    res.writeHead(200, { 'content-type': 'image/png' }).end(PIXEL)
+    return
+  }
   const path = join(site, decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\/$/, '/index.html'))
   if (!path.startsWith(site) || !existsSync(path)) {
     res.writeHead(404).end()
@@ -141,6 +148,35 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.keyboard.press('Enter')
     await page.waitForTimeout(300)
     check(`${name}: in the visual mode too, written as a link`, (await value()).includes('and [[Plans]]'), (await value()).slice(-60))
+
+    // Pictures: pasted into the visual editor, dropped on the source — saved by the host, written as Markdown.
+    const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=='
+    const deliver = (selector, type, fileName) =>
+      page.evaluate(([selector, type, fileName, png]) => {
+        const bytes = Uint8Array.from(window.atob(png), (c) => c.charCodeAt(0))
+        const dt = new DataTransfer()
+        dt.items.add(new window.File([bytes], fileName, { type: 'image/png' }))
+        const target = document.querySelector(selector)
+        const r = target.getBoundingClientRect()
+        const init = { bubbles: true, cancelable: true, clientX: r.left + 20, clientY: r.top + 10 }
+        if (type === 'paste') target.dispatchEvent(new ClipboardEvent('paste', { ...init, clipboardData: dt }))
+        else {
+          target.dispatchEvent(new window.DragEvent('dragover', { ...init, dataTransfer: dt }))
+          target.dispatchEvent(new window.DragEvent('drop', { ...init, dataTransfer: dt }))
+        }
+      }, [selector, type, fileName, PNG])
+    await last.click()
+    await page.keyboard.press('End')
+    await deliver('#editor [contenteditable="true"]', 'paste', 'shot.png')
+    await page.waitForTimeout(300)
+    check(`${name}: a pasted picture is saved and shown`, (await value()).includes('![shot](pictures/shot.png)') && (await page.locator('#editor [contenteditable] img[src$="pictures/shot.png"]').count()) === 1, (await value()).slice(-80))
+    await page.locator('#editor .dsk-md__mode').nth(1).click()
+    await page.locator('#editor .dsk-md__source').click()
+    await page.keyboard.press(`${mod}+End`)
+    await deliver('#editor .dsk-md__source', 'drop', 'Diagram one.png')
+    await page.waitForTimeout(300)
+    check(`${name}: a picture dropped on the source is written as Markdown`, (await value()).includes('![Diagram one](pictures/Diagram%20one.png)'), JSON.stringify((await value()).match(/.{0,30}Diagram.{0,30}/)?.[0] ?? (await value()).slice(-40)))
+    await page.locator('#editor .dsk-md__mode').nth(0).click()
 
     if (name === 'chromium') await page.screenshot({ path: join(output, 'editor.png'), fullPage: true })
     check(`${name}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '))

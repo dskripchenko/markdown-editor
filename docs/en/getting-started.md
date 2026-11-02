@@ -49,6 +49,8 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `labels` | `object` | Single strings over the language's own. |
 | `image-base` | `string` | The folder (a URL ending in `/`) relative pictures resolve against: `img/a.png` shows from there and is saved back as `img/a.png`, `../a.png` too. |
 | `link-base` | `string` | The base of relative links in the preview. |
+| `linkSuggest` | `(query) => items` | What `[[` offers as it is typed (internal links): `{ label, insert, detail? }[]` or a promise of them; a choice writes `[[insert]]`. None: no list. |
+| `saveImage` | `(file) => path` | Pictures pasted, dropped or chosen with the toolbar's image button: the host saves the `File` and returns the path for the Markdown (or a promise of it; `null` skips it); `![name](path)` is written at the caret. None: pictures are not taken. |
 
 Events: `update:modelValue` and `change` with the Markdown — only when the
 document is edited, never on loading it. `update:mode`.
