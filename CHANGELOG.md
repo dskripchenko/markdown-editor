@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+### Patch Changes
+
+- 89c47d3: `@dskripchenko/wysiwyg` 0.12 allowed as a peer: embedded notes (`![[note]]`) kept through the visual mode.
+
 ## 0.8.0
 
 ### Minor Changes
