@@ -31,13 +31,18 @@ const fee = amount * 0.004
 > Watchers get no notification.
 `
 
+// The documents `[[` offers, as a host would list them.
+const NOTES = ['Plans', 'Road map', 'Release notes', 'Notes/Ideas']
+const linkSuggest = (q: string) =>
+  NOTES.filter((n) => n.toLowerCase().includes(q.toLowerCase())).map((n) => ({ label: n.split('/').pop()!, insert: n, detail: n.includes('/') ? n.split('/')[0] : undefined }))
+
 const App = defineComponent({
   setup() {
     const value = ref(SAMPLE)
     const mode = ref<MarkdownEditorMode>('visual')
     ;(window as unknown as { __md: () => string }).__md = () => value.value
     return () => h('div', [
-      h(MarkdownEditor, { id: 'editor', modelValue: value.value, 'onUpdate:modelValue': (v: string) => (value.value = v), mode: mode.value, 'onUpdate:mode': (m: MarkdownEditorMode) => (mode.value = m), minHeight: '320px' }),
+      h(MarkdownEditor, { id: 'editor', modelValue: value.value, 'onUpdate:modelValue': (v: string) => (value.value = v), mode: mode.value, 'onUpdate:mode': (m: MarkdownEditorMode) => (mode.value = m), minHeight: '320px', linkSuggest }),
       h('h3', 'Value'),
       h('pre', { id: 'out' }, value.value),
     ])

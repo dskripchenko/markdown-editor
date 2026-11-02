@@ -4,3 +4,4 @@ export { fromMarkdown, toMarkdown, normalize, splitBlocks, relativeTo, SOURCE_LA
 export type { MarkdownBlock, ConvertOptions } from './convert'
 export { labelsFor, markdownEditorLocales } from './locale'
 export type { MarkdownEditorLabels, MarkdownEditorLocale } from './locale'
+export type { LinkSuggest, LinkSuggestion } from './linkSuggest'
