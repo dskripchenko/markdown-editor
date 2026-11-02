@@ -54,6 +54,8 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 
 TeX math (`$…$`, `$$…$$`) and `==highlights==` are shown drawn in the visual mode (with `@dskripchenko/ui` 1.26 and `@dskripchenko/wysiwyg` 0.10 or later): a formula is one piece — a double click edits its TeX, the slash menu's **Formula** inserts one — and the Markdown keeps it as written; the source highlights its TeX.
 
+A YAML front matter at the start (the document's properties) is kept exactly as written; `#tags` are shown as tags in the visual mode (with `@dskripchenko/ui` 1.27 and `@dskripchenko/wysiwyg` 0.11).
+
 Events: `update:modelValue` and `change` with the Markdown — only when the
 document is edited, never on loading it. `update:mode`.
 

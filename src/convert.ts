@@ -42,6 +42,14 @@ export function splitBlocks(markdown: string): MarkdownBlock[] {
   const take = (from: number, to: number, source: boolean): void => {
     blocks.push({ lines: lines.slice(from, to), source })
   }
+  // The document's properties (a YAML front matter at the very start): kept as written.
+  if (/^---[ \t]*$/.test(lines[0] ?? '')) {
+    const end = lines.findIndex((l, k) => k > 0 && /^(?:---|\.\.\.)[ \t]*$/.test(l))
+    if (end > 0) {
+      take(0, end + 1, true)
+      i = end + 1
+    }
+  }
   while (i < lines.length) {
     const line = lines[i] ?? ''
     if (line.trim() === '') {
