@@ -4,6 +4,7 @@ import { tokenize, UidMarkdown, useLocale } from '@dskripchenko/ui'
 import { DskWysiwyg } from '@dskripchenko/wysiwyg'
 import { fromMarkdown, toMarkdown } from './convert'
 import { labelsFor, type MarkdownEditorLabels, type MarkdownEditorLocale } from './locale'
+import { useLinkSuggest, type LinkSuggest } from './linkSuggest'
 import './style.css'
 
 export type MarkdownEditorMode = 'visual' | 'source' | 'split'
@@ -32,6 +33,8 @@ const props = withDefaults(defineProps<{
   imageBase?: string
   /** The base of relative links in the preview. */
   linkBase?: string
+  /** What `[[` offers to link to, as it is typed (internal links); none: no list. */
+  linkSuggest?: LinkSuggest
 }>(), {
   modelValue: '',
   modes: () => ['visual', 'source', 'split'],
@@ -48,6 +51,7 @@ const props = withDefaults(defineProps<{
   labels: undefined,
   imageBase: undefined,
   linkBase: undefined,
+  linkSuggest: undefined,
 })
 
 const emit = defineEmits<{
@@ -92,6 +96,14 @@ function onHtml(next: string): void {
 
 function onSource(event: Event): void {
   commit((event.target as HTMLTextAreaElement).value)
+  void links.check(event.target as HTMLTextAreaElement)
+}
+
+// Internal links: `[[` and a few letters offer the host's documents.
+const links = useLinkSuggest(() => props.linkSuggest, (field) => commit(field.value))
+
+function onVisualInput(): void {
+  if (props.linkSuggest) void links.check(null)
 }
 
 // The source highlighted: a copy of the text in colour over the field, the field's own
@@ -159,6 +171,7 @@ function onPaste(event: ClipboardEvent): void {
 }
 
 function onTab(event: KeyboardEvent): void {
+  if (links.key(event)) return
   if (event.key !== 'Tab' || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return
   event.preventDefault()
   const el = event.target as HTMLTextAreaElement
@@ -219,6 +232,9 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
       class="dsk-md__visual"
       :data-source-label="t.sourceBlock"
       @paste.capture="onPaste"
+      @input="onVisualInput"
+      @keydown.capture="links.key"
+      @focusout="links.close"
     >
       <DskWysiwyg
         ref="wysiwyg"
@@ -258,6 +274,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         @input="onSource"
         @keydown="onTab"
         @scroll="syncShade"
+        @blur="links.close"
       />
       <div
         v-if="mode === 'split'"
@@ -272,5 +289,27 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         />
       </div>
     </div>
+    <Teleport to="body">
+      <ul
+        v-if="links.state.open"
+        class="dsk-md__suggest"
+        role="listbox"
+        :style="{ left: `${links.state.left}px`, top: `${links.state.top}px` }"
+      >
+        <li
+          v-for="(item, i) in links.state.items"
+          :key="item.insert"
+          role="option"
+          :aria-selected="i === links.state.index"
+          @mousedown.prevent="links.choose(i)"
+        >
+          <span class="dsk-md__suggest-label">{{ item.label }}</span>
+          <span
+            v-if="item.detail"
+            class="dsk-md__suggest-detail"
+          >{{ item.detail }}</span>
+        </li>
+      </ul>
+    </Teleport>
   </div>
 </template>

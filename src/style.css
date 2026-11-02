@@ -141,3 +141,25 @@
 }
 
 .dsk-md__shade .uid-code__tok--heading { font-weight: 700; }
+
+/* Internal links offered as `[[` is typed. */
+.dsk-md__suggest {
+  position: fixed;
+  z-index: 1000;
+  min-width: 220px;
+  max-width: 320px;
+  max-height: 280px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--uid-color-border, #e5e7eb);
+  border-radius: var(--uid-radius-md, 8px);
+  background: var(--uid-color-bg, #fff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font: 13px/1.4 var(--uid-font-family, system-ui, sans-serif);
+}
+.dsk-md__suggest li { display: flex; flex-direction: column; padding: 5px 8px; border-radius: 6px; cursor: pointer; }
+.dsk-md__suggest li[aria-selected="true"] { background: color-mix(in srgb, var(--uid-accent, #3b82f6) 16%, transparent); }
+.dsk-md__suggest-label { color: var(--uid-color-text, #111827); }
+.dsk-md__suggest-detail { color: var(--uid-text-tertiary, #6b7280); font-size: 11px; }
