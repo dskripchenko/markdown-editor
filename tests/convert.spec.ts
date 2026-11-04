@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from '@dskripchenko/ui'
+import { sanitizeHtml } from '@dskripchenko/wysiwyg'
 import { fromMarkdown, normalize, relativeTo, splitBlocks, toMarkdown } from '../src/convert'
 
 const textOf = (md: string): string => {
@@ -20,7 +21,7 @@ describe('blocks', () => {
       'A footnote[^1].', '', '[^1]: The note.', '', '- plain', '- list',
     ].join('\n')
     expect(splitBlocks(md).map((b) => `${b.kind}:${b.text.split('\n')[0]}`)).toEqual([
-      'markdown:# Title', 'markdown:Text with **bold**.', 'source:#### Small heading', 'source:- [ ] a task',
+      'markdown:# Title', 'markdown:Text with **bold**.', 'source:#### Small heading', 'markdown:- [ ] a task',
       'source:> [!NOTE]', 'source:<details>', 'source:A [reference][ref] link.', 'source:[ref]: https://example.com',
       'source:A footnote[^1].', 'source:[^1]: The note.', 'markdown:- plain',
     ])
@@ -47,6 +48,20 @@ describe('round trip', () => {
 
   it('source blocks reach the editor as code of their own language', () => {
     expect(fromMarkdown('#### h4')).toBe('<pre><code class="language-x-markdown">#### h4</code></pre>')
+  })
+})
+
+describe('task lists', () => {
+  it('edited as lists with boxes: ticked and not, nested and ordered, back as written', () => {
+    const md = '- [x] Cart\n- [ ] Refunds\n  - [ ] Partial\n- Plain\n\n1. [x] First\n2. [ ] Second\n'
+    // What the editor holds: the rendered HTML through its sanitizer, the boxes as the items' state.
+    const held = sanitizeHtml(fromMarkdown(md))
+    expect(held).toContain('<li data-checked="true">Cart</li>')
+    expect(held).not.toContain('<input')
+    expect(toMarkdown(held)).toBe(md)
+    // Saved without the editor too, and a loose list of tasks.
+    expect(normalize(md)).toBe(md)
+    expect(normalize('- [x] One\n\n  More of one.\n\n- [ ] Two\n')).toBe('- [x] One\n\n  More of one.\n\n- [ ] Two\n')
   })
 })
 

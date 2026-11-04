@@ -71,10 +71,15 @@ nummerierte Punkte —, jeder weitere lässt es, wie es ist. Text wird nur dort
 maskiert, wo ein Zeichen sonst Markup bedeuten würde: `1.5`, `a-b`, `(netto)`
 bleiben, wie sie sind.
 
+Aufgabenlisten `- [ ]` / `- [x]` werden als Listen mit Kästchen bearbeitet: ein
+Klick auf ein Kästchen hakt es ab, `[ ] ` oder `[x] ` am Anfang eines Eintrags
+macht ihn zur Aufgabe, Enter nach einer Aufgabe beginnt eine nicht abgehakte
+(`@dskripchenko/wysiwyg` 0.13 oder neuer; mit einem älteren bleiben sie wie
+geschrieben).
+
 Was der visuelle Editor nicht abbilden kann, bleibt **wie geschrieben**:
 
 - Überschriften `####`, `#####`, `######`;
-- Aufgabenlisten `- [ ]` / `- [x]`;
 - Hinweisboxen `> [!NOTE]`, `> [!WARNING]`…;
 - HTML-Blöcke (`<details>`, `<div>`…);
 - Fußnoten `[^1]` und ihre Definitionen;

@@ -3,8 +3,10 @@
  *
  * `fromMarkdown` renders Markdown with the kit's renderer into the HTML the
  * WYSIWYG editor edits; `toMarkdown` writes the editor's HTML back with the
- * editor's own converter. What the editor cannot hold — headings below h3,
- * task lists, callouts, HTML blocks, footnotes, reference-style links — is
+ * editor's own converter. Task lists are edited as lists with boxes to tick
+ * where the editor holds them (wysiwyg 0.13 and later). What the editor cannot
+ * hold — headings below h3, callouts, HTML blocks, footnotes, reference-style
+ * links, and task lists for an older editor — is
  * kept as a source block: a code block of the language {@link SOURCE_LANG}
  * that shows the Markdown as written and comes back out byte for byte.
  *
@@ -12,7 +14,7 @@
  * spacing); every later round changes nothing.
  */
 import { renderMarkdown } from '@dskripchenko/ui'
-import { htmlToMarkdown } from '@dskripchenko/wysiwyg'
+import { htmlToMarkdown, sanitizeHtml } from '@dskripchenko/wysiwyg'
 
 /** The code-block language of Markdown kept as written. */
 export const SOURCE_LANG = 'x-markdown'
@@ -26,6 +28,19 @@ export interface MarkdownBlock {
 const FENCE = /^\s{0,3}(`{3,}|~{3,})/
 const LIST_ITEM = /^(\s*)([-*+]|\d+[.)])\s+/
 const TASK_ITEM = /^\s*([-*+]|\d+[.)])\s+\[[ xX]\]\s/
+
+let tasks: boolean | null = null
+/** Whether the editor holds task items (its sanitizer keeps a box's state): an older one drops it. */
+export function editorHoldsTasks(): boolean {
+  if (tasks === null) {
+    try {
+      tasks = typeof DOMParser !== 'undefined' && sanitizeHtml('<ul><li data-checked="true">x</li></ul>').includes('data-checked="true"')
+    } catch {
+      tasks = false
+    }
+  }
+  return tasks
+}
 const HTML_BLOCK = /^\s{0,3}<(?:[A-Za-z][\w-]*[\s/>]|[A-Za-z][\w-]*$|\/[A-Za-z]|!--)/
 const FOOTNOTE = /^\s{0,3}\[\^[^\]]+\]:/
 const LINK_DEFINITION = /^\s{0,3}\[[^\]^][^\]]*\]:\s*\S/
@@ -92,7 +107,7 @@ export function splitBlocks(markdown: string): MarkdownBlock[] {
         break
       }
       const block = lines.slice(start, i)
-      take(start, i, block.some((l) => TASK_ITEM.test(l)) || block.some((l) => REFERENCE.test(l)))
+      take(start, i, (!editorHoldsTasks() && block.some((l) => TASK_ITEM.test(l))) || block.some((l) => REFERENCE.test(l)))
       continue
     }
     if (/^\s{0,3}>/.test(line)) {
@@ -175,7 +190,7 @@ export function fromMarkdown(markdown: string, options: ConvertOptions = {}): st
   const out: string[] = []
   let pending: string[] = []
   const flush = (): void => {
-    if (pending.length) out.push(renderMarkdown(pending.join('\n\n'), options.imageBase ? { imageBase: options.imageBase } : {}))
+    if (pending.length) out.push(heldTasks(renderMarkdown(pending.join('\n\n'), options.imageBase ? { imageBase: options.imageBase } : {})))
     pending = []
   }
   for (const block of splitBlocks(markdown)) {
@@ -188,6 +203,26 @@ export function fromMarkdown(markdown: string, options: ConvertOptions = {}): st
   }
   flush()
   return out.join('\n')
+}
+
+/**
+ * The rendered task items as the editor holds them: a box opening an item
+ * becomes the item's `data-checked`, the box itself goes — so a round without
+ * the editor (`normalize`) keeps them too.
+ */
+function heldTasks(html: string): string {
+  if (!html.includes('type="checkbox"') || typeof DOMParser === 'undefined' || !editorHoldsTasks()) return html
+  const root = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html').body.firstElementChild
+  if (!root) return html
+  // In the item, or in its first paragraph (a loose list).
+  for (const box of Array.from(root.querySelectorAll('li > input[type="checkbox"]:first-child, li > p:first-child > input[type="checkbox"]:first-child'))) {
+    const li = box.closest('li')!
+    li.setAttribute('data-checked', box.hasAttribute('checked') ? 'true' : 'false')
+    const next = box.nextSibling
+    if (next && next.nodeType === Node.TEXT_NODE) next.textContent = (next.textContent ?? '').replace(/^\s+/, '')
+    box.remove()
+  }
+  return root.innerHTML
 }
 
 const SOURCE_FENCE = new RegExp(`^(\`{3,})${SOURCE_LANG}\\n([\\s\\S]*?)\\n\\1$`, 'gm')

@@ -30,9 +30,12 @@ const text = ref('# Release notes\n\nVersion **3.1**.')
   Markdown: the first save puts it in canonical form (`-` for lists, `**`
   for bold), every later one changes nothing. Plain text keeps its dots,
   dashes and brackets.
+- **Task lists** (`- [ ]` / `- [x]`) are edited as lists with boxes to tick
+  (with `@dskripchenko/wysiwyg` 0.13 or later; an older one keeps them as
+  written).
 - **Nothing is lost.** What the visual editor cannot hold — headings below
-  h3, task lists, callouts, HTML blocks, footnotes, reference-style links —
-  stays as written: shown as a block of Markdown and saved byte for byte.
+  h3, callouts, HTML blocks, footnotes, reference-style links — stays as
+  written: shown as a block of Markdown and saved byte for byte.
 - **Pasting Markdown** as plain text gives formatted text; pasting from a
   page or a document is cleaned by the editor's sanitizer.
 - Live blocks (```` ```mermaid ```` and others) through `blockRenderers` —
