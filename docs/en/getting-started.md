@@ -70,10 +70,14 @@ and `*` for emphasis, ATX headings, list items renumbered — and every later
 round leaves it as it is. Text is escaped only where a character would
 otherwise mean markup: `1.5`, `a-b`, `(net)` stay as written.
 
+Task lists `- [ ]` / `- [x]` are edited as lists with boxes: a click on a box
+ticks it, `[ ] ` or `[x] ` typed at the start of an item makes a task, Enter
+after a task starts an unticked one (`@dskripchenko/wysiwyg` 0.13 or later; with
+an older one they are kept as written).
+
 What the visual editor cannot hold is kept **as written**:
 
 - headings `####`, `#####`, `######`;
-- task lists `- [ ]` / `- [x]`;
 - callouts `> [!NOTE]`, `> [!WARNING]`…;
 - HTML blocks (`<details>`, `<div>`…);
 - footnotes `[^1]` and their definitions;

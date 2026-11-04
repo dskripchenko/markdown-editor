@@ -52,7 +52,10 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     const sample = await value()
     await page.waitForTimeout(300)
     check(`${name}: loading the editor does not change the value`, (await value()) === sample)
-    check(`${name}: what the editor cannot hold is shown as written`, (await page.locator('#editor pre code.language-x-markdown').count()) === 4)
+    check(`${name}: what the editor cannot hold is shown as written`, (await page.locator('#editor pre code.language-x-markdown').count()) === 3)
+    // Task lists: items with boxes, their state from the Markdown.
+    const tasks = () => page.evaluate(() => [...document.querySelectorAll('#editor [contenteditable] li[data-checked]')].map((li) => `${li.getAttribute('data-checked')}:${li.textContent}`))
+    check(`${name}: a task list is items with boxes`, JSON.stringify(await tasks()) === JSON.stringify(['true:Release notes', 'false:Customer email']), JSON.stringify(await tasks()))
     // Formulas: islands drawn as MathML, a highlight as <mark>; their Markdown unchanged by loading (checked above).
     const islands = await page.evaluate(() => [...document.querySelectorAll('#editor [contenteditable] span[data-math]')].map((el) => ({ tex: el.getAttribute('data-math'), display: el.getAttribute('data-display'), drawn: !!el.querySelector('math'), editable: el.getAttribute('contenteditable'), height: el.getBoundingClientRect().height })))
     check(`${name}: formulas are islands drawn as MathML`, islands.length === 2 && islands.every((i) => i.drawn && i.editable === 'false' && i.height > 8) && islands[1].display === 'block', JSON.stringify(islands))
@@ -79,6 +82,24 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     check(`${name}: typing and bold become Markdown`, /changelog "Changelog"\)\. Extra \*\*strong\*\* text\./.test(typed), JSON.stringify(typed.split('\n')[2]))
     check(`${name}: the blocks kept as written stay byte for byte`, typed.includes('#### Kept as written\n\n- [x] Release notes\n- [ ] Customer email\n\n> [!NOTE]\n> Watchers get no notification.'))
     check(`${name}: the table and the code survive the edit`, typed.includes('| Method | Fee |\n| :--- | ---: |') && typed.includes('```js\nconst fee = amount * 0.004\n```'))
+
+    // A click on a box ticks it; Enter after a task starts an unticked one; `[x] ` typed makes an item a task.
+    const email = page.locator('#editor [contenteditable] li[data-checked]', { hasText: 'Customer email' })
+    const box = await email.boundingBox()
+    await page.mouse.click(box.x - 12, box.y + box.height / 2)
+    await page.waitForTimeout(200)
+    check(`${name}: a click on the box ticks the task`, (await value()).includes('- [x] Release notes\n- [x] Customer email'), JSON.stringify((await value()).match(/- \[.\] Customer email/)?.[0]))
+    await email.click({ position: { x: box.width - 4, y: box.height / 2 } })
+    await page.keyboard.press('End')
+    await page.keyboard.press('Enter')
+    await page.keyboard.type('Survey')
+    await page.waitForTimeout(200)
+    check(`${name}: Enter after a task starts an unticked one`, (await value()).includes('- [x] Customer email\n- [ ] Survey'), JSON.stringify((await value()).match(/Customer email[\s\S]{0,30}/)?.[0]))
+    await page.keyboard.press('Enter')
+    await page.keyboard.press('Enter')
+    await page.keyboard.type('- [x] Shipped')
+    await page.waitForTimeout(200)
+    check(`${name}: "- " then "[x] " typed makes a ticked task`, (await value()).includes('- [x] Shipped') && (await page.locator('#editor [contenteditable] li[data-checked="true"]', { hasText: 'Shipped' }).count()) === 1, JSON.stringify((await value()).match(/Survey[\s\S]{0,40}/)?.[0]))
 
     // Markdown pasted as plain text arrives formatted.
     await page.locator('#editor [contenteditable] p').first().click()
