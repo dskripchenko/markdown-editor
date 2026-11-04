@@ -85,10 +85,15 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
 
     // A click on a box ticks it; Enter after a task starts an unticked one; `[x] ` typed makes an item a task.
     const email = page.locator('#editor [contenteditable] li[data-checked]', { hasText: 'Customer email' })
+    // In view first: the page is longer where the fonts are taller (Linux).
+    await email.scrollIntoViewIfNeeded()
     const box = await email.boundingBox()
-    await page.mouse.click(box.x - 12, box.y + box.height / 2)
+    // On the box's line, in the list's gutter (what the browser reports there differs: the item, or the list).
+    const spot = { x: box.x - 12, y: box.y + 10 }
+    const under = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.tagName, spot)
+    await page.mouse.click(spot.x, spot.y)
     await page.waitForTimeout(200)
-    check(`${name}: a click on the box ticks the task`, (await value()).includes('- [x] Release notes\n- [x] Customer email'), JSON.stringify((await value()).match(/- \[.\] Customer email/)?.[0]))
+    check(`${name}: a click on the box ticks the task`, (await value()).includes('- [x] Release notes\n- [x] Customer email'), `${under} ${JSON.stringify((await value()).match(/- \[.\] Customer email/)?.[0])}`)
     await email.click({ position: { x: box.width - 4, y: box.height / 2 } })
     await page.keyboard.press('End')
     await page.keyboard.press('Enter')
