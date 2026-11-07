@@ -61,6 +61,22 @@ for (const [name, type] of [['chromium', chromium], ['webkit', webkit]]) {
     check(`${name}: formulas are islands drawn as MathML`, islands.length === 2 && islands.every((i) => i.drawn && i.editable === 'false' && i.height > 8) && islands[1].display === 'block', JSON.stringify(islands))
     check(`${name}: a highlight is a mark`, (await page.locator('#editor [contenteditable] mark', { hasText: 'in force from Monday' }).count()) === 1)
     check(`${name}: a tag is a chip; the front matter is kept as written`, (await page.locator('#editor [contenteditable] .uid-markdown__tag[data-tag="pricing"]').count()) === 1 && (await page.locator('#editor pre code.language-x-markdown', { hasText: 'tags: [payments, release]' }).count()) === 1)
+    // A block id: a quiet mark nobody types into; text typed right after it goes before it.
+    const marks = await page.evaluate(() => [...document.querySelectorAll('#editor [contenteditable] span[data-block-id]')].map((el) => `${el.textContent}:${el.getAttribute('contenteditable')}`))
+    check(`${name}: a block id is a quiet mark`, JSON.stringify(marks) === JSON.stringify(['^refunds:false']), JSON.stringify(marks))
+    await page.evaluate(() => {
+      const mark = document.querySelector('#editor [contenteditable] span[data-block-id]')
+      mark.closest('[contenteditable="true"]').focus()
+      const range = document.createRange()
+      range.setStartAfter(mark)
+      range.collapse(true)
+      window.getSelection().removeAllRanges()
+      window.getSelection().addRange(range)
+    })
+    await page.keyboard.type(' Weekends count.')
+    await page.waitForTimeout(300)
+    check(`${name}: text typed after a block id goes before it`, (await value()).includes('Refunds take up to five days. Weekends count. ^refunds\n'), JSON.stringify((await value()).match(/Refunds[^\n]*/)?.[0]))
+
     // A double click on a formula asks for its TeX; the answer is written back.
     page.once('dialog', (d) => d.accept('g = a \\cdot 0.005'))
     await page.locator('#editor [contenteditable] span[data-math]').first().dblclick()
