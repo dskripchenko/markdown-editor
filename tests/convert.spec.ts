@@ -120,3 +120,17 @@ describe('the document\u2019s properties', () => {
     expect(splitBlocks('---\ntitle: x')[0]!.kind).toBe('markdown')
   })
 })
+
+describe('block ids (^id) through the visual mode', () => {
+  it('come back byte for byte, though the kit hides them when it renders a page', () => {
+    for (const md of [
+      'Pay by the fifth. ^pay-rule\n\nNext.\n',
+      '## Goals ^goals\n',
+      '- item ^li1\n- two\n',
+      '- [ ] task ^t1\n',
+      '> quote ^q1\n',
+    ]) {
+      expect(normalize(md)).toBe(md)
+    }
+  })
+})
