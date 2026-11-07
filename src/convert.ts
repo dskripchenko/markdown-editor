@@ -190,9 +190,10 @@ export function fromMarkdown(markdown: string, options: ConvertOptions = {}): st
   const out: string[] = []
   let pending: string[] = []
   const flush = (): void => {
-    // Block ids (` ^id`) stay text in the editor: since @dskripchenko/ui 1.30 the
-    // renderer hides them in attributes the editor does not keep, and saving
-    // from the visual mode would drop them — and break every link to the block.
+    // Block ids (` ^id`) are rendered as text: an editor before wysiwyg 0.14 keeps
+    // them as text (the renderer's attributes, since @dskripchenko/ui 1.30, it would
+    // drop — and break every link to the block); 0.14 and later make each a quiet
+    // mark kept at the end of its block.
     const render = { blockIds: false, ...(options.imageBase ? { imageBase: options.imageBase } : {}) }
     if (pending.length) out.push(heldTasks(renderMarkdown(pending.join('\n\n'), render)))
     pending = []

@@ -133,4 +133,11 @@ describe('block ids (^id) through the visual mode', () => {
       expect(normalize(md)).toBe(md)
     }
   })
+
+  it('are quiet marks in the visual mode, last in their blocks (wysiwyg 0.14+)', () => {
+    const html = sanitizeHtml(fromMarkdown('Pay by the fifth. ^pay-rule\n\n- item ^li1\n'))
+    expect(html).toContain('<p>Pay by the fifth.<span data-block-id="pay-rule"></span></p>')
+    expect(html).toContain('<li>item<span data-block-id="li1"></span></li>')
+    expect(toMarkdown(html)).toBe('Pay by the fifth. ^pay-rule\n\n- item ^li1\n')
+  })
 })
