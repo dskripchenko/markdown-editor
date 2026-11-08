@@ -40,6 +40,9 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `modes` | `string[]` | The modes offered; all three by default. |
 | `modeSwitch` | `boolean` | The mode buttons above the editor; `false` when the host switches modes itself (`v-model:mode`). Default `true`. |
 | `toolbarTarget` | `string \| HTMLElement` | Where the visual mode's toolbar is shown instead of above the text: the host's own bar (an element or a CSS selector). |
+| `toolbar` | `boolean` | The visual mode's toolbar above the text; `false` when formatting comes from the bubble or the host. Default `true`. |
+| `bubble` | `boolean \| string[]` | A small dark toolbar floating above a selection in the visual mode: `true` for bold, italic, underline, strike, inline code, link, heading 2 and bullet list, or the toolbar items to show. Needs `@dskripchenko/wysiwyg` 0.15. |
+| `frameless` | `boolean` | No frame: the visual editor, the mode buttons, the source and the preview drop their borders and backgrounds, so the page around shows through. Needs `@dskripchenko/wysiwyg` 0.15 for the visual editor. |
 | `placeholder` | `string` | Shown while the document is empty. |
 | `readonly` | `boolean` | Read-only in every mode. |
 | `min-height`, `max-height` | `string` | The editing area's height. |
@@ -61,6 +64,18 @@ document is edited, never on loading it. `update:mode`.
 
 Exposed: `focus()`, `insert(markdown)` (at the caret; formatted in the visual
 mode), `value`.
+
+## Edit in place
+
+To edit a page where it stands — the text looking like the page, formatting
+from a bar over the selection:
+
+```vue
+<MarkdownEditor v-model="text" frameless bubble :toolbar="false" :mode-switch="false" />
+```
+
+The bar's look is themed through the editor's `--dsk-wysiwyg-bubble-*`
+variables.
 
 ## The round trip
 

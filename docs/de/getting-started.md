@@ -40,6 +40,9 @@ Der Umschalter zeigt die Modi aus `modes`; bei nur einem Modus gibt es keinen.
 | `modes` | `string[]` | Die angebotenen Modi; standardmäßig alle drei. |
 | `modeSwitch` | `boolean` | Die Modusknöpfe über dem Editor; `false`, wenn die Anwendung die Modi selbst umschaltet (`v-model:mode`). Standard `true`. |
 | `toolbarTarget` | `string \| HTMLElement` | Wo die Toolbar des visuellen Modus statt über dem Text erscheint: die eigene Leiste der Anwendung (ein Element oder ein CSS-Selektor). |
+| `toolbar` | `boolean` | Die Toolbar des visuellen Modus über dem Text; `false`, wenn die Formatierung aus der schwebenden Toolbar oder von der Anwendung kommt. Standard `true`. |
+| `bubble` | `boolean \| string[]` | Eine kleine dunkle Toolbar über einer Auswahl im visuellen Modus: `true` für Fett, Kursiv, Unterstrichen, Durchgestrichen, Inline-Code, Link, Überschrift 2 und Aufzählung, oder die gewünschten Elemente. Braucht `@dskripchenko/wysiwyg` 0.15. |
+| `frameless` | `boolean` | Ohne Rahmen: visueller Editor, Modusknöpfe, Quelltext und Vorschau ohne Rahmen und Hintergrund, sodass die Seite durchscheint. Für den visuellen Editor braucht es `@dskripchenko/wysiwyg` 0.15. |
 | `placeholder` | `string` | Wird im leeren Dokument gezeigt. |
 | `readonly` | `boolean` | In allen Modi schreibgeschützt. |
 | `min-height`, `max-height` | `string` | Die Höhe des Bearbeitungsbereichs. |
@@ -61,6 +64,17 @@ Dokument bearbeitet wird, nie beim Laden. `update:mode`.
 
 Nach außen: `focus()`, `insert(markdown)` (an der Einfügemarke; im visuellen
 Modus formatiert), `value`.
+
+## Bearbeiten an Ort und Stelle
+
+Um eine Seite dort zu bearbeiten, wo sie steht — der Text sieht aus wie die
+Seite, die Formatierung kommt aus einer Leiste über der Auswahl:
+
+```vue
+<MarkdownEditor v-model="text" frameless bubble :toolbar="false" :mode-switch="false" />
+```
+
+Das Aussehen der Leiste steuern die Variablen `--dsk-wysiwyg-bubble-*` des Editors.
 
 ## Der Rundweg
 

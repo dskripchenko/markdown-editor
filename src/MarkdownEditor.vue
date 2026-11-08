@@ -13,6 +13,7 @@ export type MarkdownEditorMode = 'visual' | 'source' | 'split'
 type BlockRenderers = InstanceType<typeof DskWysiwyg>['$props']['blockRenderers']
 type ToolbarItems = InstanceType<typeof DskWysiwyg>['$props']['toolbarItems']
 type SlashCommands = InstanceType<typeof DskWysiwyg>['$props']['slashCommands']
+type ToolbarItem = NonNullable<ToolbarItems>[number]
 
 const props = withDefaults(defineProps<{
   modelValue?: string
@@ -27,6 +28,19 @@ const props = withDefaults(defineProps<{
   toolbarTarget?: string | HTMLElement
   /** The mode buttons above the editor; off when the host switches modes itself (`v-model:mode`). */
   modeSwitch?: boolean
+  /** The visual mode's toolbar above the text; off when formatting comes from the bubble or the host. */
+  toolbar?: boolean
+  /**
+   * The visual mode's small toolbar floating above a selection: `true` for
+   * the default set, or the items to show (`@dskripchenko/wysiwyg` 0.15+).
+   */
+  bubble?: ToolbarItem[] | boolean
+  /**
+   * No frame: the visual editor, the mode buttons and the source drop their
+   * borders and backgrounds, so the page around shows through
+   * (`@dskripchenko/wysiwyg` 0.15+ for the visual editor).
+   */
+  frameless?: boolean
   slashCommands?: SlashCommands
   locale?: MarkdownEditorLocale
   labels?: Partial<MarkdownEditorLabels>
@@ -49,6 +63,9 @@ const props = withDefaults(defineProps<{
   toolbarItems: undefined,
   toolbarTarget: undefined,
   modeSwitch: true,
+  toolbar: true,
+  bubble: false,
+  frameless: false,
   slashCommands: undefined,
   locale: undefined,
   labels: undefined,
@@ -73,6 +90,11 @@ const options = computed(() => ({ imageBase: props.imageBase ?? null }))
 const markdown = ref(props.modelValue)
 const html = ref(fromMarkdown(props.modelValue, options.value))
 const wysiwyg = ref<InstanceType<typeof DskWysiwyg> | null>(null)
+/** Only what is switched on goes to the visual editor: an older one would show the rest as attributes. */
+const inPlace = computed<Record<string, unknown>>(() => ({
+  ...(props.bubble !== false ? { bubble: props.bubble } : {}),
+  ...(props.frameless ? { frameless: true } : {}),
+}))
 const area = ref<HTMLTextAreaElement | null>(null)
 
 watch(() => props.modelValue, (next) => {
@@ -282,7 +304,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
 <template>
   <div
     class="dsk-md"
-    :class="[`dsk-md--${mode}`, { 'dsk-md--readonly': readonly }]"
+    :class="[`dsk-md--${mode}`, { 'dsk-md--readonly': readonly, 'dsk-md--frameless': frameless }]"
     :style="{ '--dsk-md-min-h': minHeight, '--dsk-md-max-h': maxHeight }"
   >
     <div
@@ -317,12 +339,14 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
     >
       <DskWysiwyg
         ref="wysiwyg"
+        v-bind="inPlace"
         :model-value="html"
         :placeholder="placeholder"
         :readonly="readonly"
         :min-height="minHeight"
         :max-height="maxHeight"
         :block-renderers="blockRenderers"
+        :toolbar="toolbar"
         :toolbar-items="toolbarItems"
         :toolbar-target="toolbarTarget"
         :slash-commands="slashCommands"
