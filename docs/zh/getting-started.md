@@ -40,6 +40,9 @@ const mode = ref('visual')
 | `modes` | `string[]` | 提供的模式；默认三种全部。 |
 | `modeSwitch` | `boolean` | 编辑器上方的模式按钮；宿主自行切换模式时设为 `false`（`v-model:mode`）。默认 `true`。 |
 | `toolbarTarget` | `string \| HTMLElement` | 可视模式工具栏的显示位置，代替文本上方：宿主自己的栏（元素或 CSS 选择器）。 |
+| `toolbar` | `boolean` | 可视模式下文本上方的工具栏；格式由浮动工具栏或宿主提供时设为 `false`。默认 `true`。 |
+| `bubble` | `boolean \| string[]` | 可视模式下浮在选区上方的小型深色工具栏：`true` 为粗体、斜体、下划线、删除线、行内代码、链接、二级标题和无序列表，或指定要显示的项。需要 `@dskripchenko/wysiwyg` 0.15。 |
+| `frameless` | `boolean` | 无边框：可视编辑器、模式按钮、源码和预览都去掉边框和背景，透出周围的页面。可视编辑器需要 `@dskripchenko/wysiwyg` 0.15。 |
 | `placeholder` | `string` | 文档为空时显示。 |
 | `readonly` | `boolean` | 所有模式下只读。 |
 | `min-height`、`max-height` | `string` | 编辑区高度。 |
@@ -59,6 +62,16 @@ TeX 公式（`$…$`、`$$…$$`）和 `==高亮==` 在可视模式下以渲染�
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 
 对外提供：`focus()`、`insert(markdown)`（插入到光标处；可视模式下已格式化）、`value`。
+
+## 原地编辑
+
+在页面原处编辑——文本看起来就是页面，格式由选区上方的工具条提供：
+
+```vue
+<MarkdownEditor v-model="text" frameless bubble :toolbar="false" :mode-switch="false" />
+```
+
+工具条的外观通过编辑器的 `--dsk-wysiwyg-bubble-*` 变量设置。
 
 ## 往返转换
 

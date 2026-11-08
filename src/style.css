@@ -91,6 +91,19 @@
   background: var(--uid-color-bg, #fff);
 }
 
+/* Frameless: the frame around the editor drops away, so the host's page shows through. */
+.dsk-md--frameless .dsk-md__modes,
+.dsk-md--frameless .dsk-md__source,
+.dsk-md--frameless .dsk-md__preview {
+  border-color: transparent;
+  background: transparent;
+}
+
+.dsk-md--frameless .dsk-md__mode--on {
+  box-shadow: none;
+  background: var(--uid-color-bg-subtle, #f1f5f9);
+}
+
 /* A block kept as written: the code block of the x-markdown language reads as such. */
 .dsk-md__visual pre:has(> code.language-x-markdown) {
   position: relative;

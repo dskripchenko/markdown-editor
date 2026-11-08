@@ -28,6 +28,28 @@ describe('MarkdownEditor', () => {
     expect(w.find('textarea').exists()).toBe(true)
   })
 
+  it('edits in place: the bubble, no frame and no toolbar go to the visual editor', async () => {
+    const { DskWysiwyg } = await import('@dskripchenko/wysiwyg')
+    const w = mount(MarkdownEditor, { props: { bubble: ['bold', 'link'], frameless: true, toolbar: false } })
+    const visual = w.findComponent(DskWysiwyg)
+    expect(visual.props('bubble')).toEqual(['bold', 'link'])
+    expect(visual.props('frameless')).toBe(true)
+    expect(visual.props('toolbar')).toBe(false)
+    expect(w.classes()).toContain('dsk-md--frameless')
+    expect(visual.classes()).toContain('dsk-wysiwyg--frameless')
+    expect(w.find('.dsk-wysiwyg-toolbar').exists()).toBe(false)
+  })
+
+  it('keeps the framed editor with its toolbar and no bubble by default', () => {
+    const w = mount(MarkdownEditor)
+    expect(w.classes()).not.toContain('dsk-md--frameless')
+    expect(w.find('.dsk-wysiwyg--frameless').exists()).toBe(false)
+    expect(w.find('.dsk-wysiwyg-toolbar').exists()).toBe(true)
+    // Nothing switched off leaks onto the editor's root as an attribute.
+    expect(w.find('.dsk-wysiwyg').attributes('bubble')).toBeUndefined()
+    expect(w.find('.dsk-wysiwyg').attributes('frameless')).toBeUndefined()
+  })
+
   it('offers the modes asked for, and none with only one', async () => {
     const w = mount(MarkdownEditor, { props: { modes: ['visual', 'source'] } })
     expect(w.findAll('.dsk-md__mode').map((b) => b.text())).toEqual(['Visual', 'Markdown'])
