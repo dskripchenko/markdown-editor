@@ -15,8 +15,8 @@ importers:
         specifier: ^1.31.0
         version: 1.31.0(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
-        specifier: ^0.15.0
-        version: 0.15.0(@dskripchenko/ui@1.31.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: ^0.16.0
+        version: 0.16.0(@dskripchenko/ui@1.31.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
@@ -229,8 +229,8 @@ packages:
     peerDependencies:
       vue: ^3.4.0
 
-  '@dskripchenko/wysiwyg@0.15.0':
-    resolution: {integrity: sha512-79Sqcd9fegWAAuOAMqJTQT5xoJWpc1MIzxOqa8/M0+41iimJvML9YnRpw5RJSIOSyf8eEm8i9mWHT2P8nqA+qA==}
+  '@dskripchenko/wysiwyg@0.16.0':
+    resolution: {integrity: sha512-maebWhtb2gLClyXK/yiIb8WDBscj8R9KrHlrElIkxLa5AVDUHv1T2JWhyNrS4Pn6jD8Ehr/IgvmMzpRlUX8cPA==}
     peerDependencies:
       '@dskripchenko/ui': ^1.0
       vue: ^3.4
@@ -1832,7 +1832,7 @@ snapshots:
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.15.0(@dskripchenko/ui@1.31.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.16.0(@dskripchenko/ui@1.31.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       '@dskripchenko/math': 0.1.0
       '@dskripchenko/syntax': 0.4.0

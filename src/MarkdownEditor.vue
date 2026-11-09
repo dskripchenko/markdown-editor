@@ -6,6 +6,7 @@ import { fromMarkdown, toMarkdown } from './convert'
 import { labelsFor, type MarkdownEditorLabels, type MarkdownEditorLocale } from './locale'
 import { useLinkSuggest, type LinkSuggest } from './linkSuggest'
 import { carriesFiles, imageFiles, imageMarkdown, type SaveImage } from './images'
+import { shiftPosition, type BubbleAction, type CaretPosition, type RemoteCaret } from './coediting'
 import './style.css'
 
 export type MarkdownEditorMode = 'visual' | 'source' | 'split'
@@ -41,6 +42,23 @@ const props = withDefaults(defineProps<{
    * (`@dskripchenko/wysiwyg` 0.15+ for the visual editor).
    */
   frameless?: boolean
+  /**
+   * The host's own buttons at the end of the visual mode's bubble — an icon
+   * and a label each, run with the selected text and its block
+   * (`@dskripchenko/wysiwyg` 0.16+).
+   */
+  bubbleActions?: BubbleAction[]
+  /**
+   * A «+» and a «⋮⋮» grip beside the visual mode's blocks: add a block, drag
+   * one elsewhere, or move, duplicate and delete it from a menu
+   * (`@dskripchenko/wysiwyg` 0.16+).
+   */
+  blockHandles?: boolean
+  /**
+   * Other people's carets, drawn over the visual mode at a block and an
+   * offset (`@dskripchenko/wysiwyg` 0.16+); the Markdown modes ignore them.
+   */
+  remoteCarets?: RemoteCaret[]
   slashCommands?: SlashCommands
   locale?: MarkdownEditorLocale
   labels?: Partial<MarkdownEditorLabels>
@@ -66,6 +84,9 @@ const props = withDefaults(defineProps<{
   toolbar: true,
   bubble: false,
   frameless: false,
+  bubbleActions: undefined,
+  blockHandles: false,
+  remoteCarets: undefined,
   slashCommands: undefined,
   locale: undefined,
   labels: undefined,
@@ -78,6 +99,12 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [markdown: string]
   change: [markdown: string]
+  /**
+   * Where the visual mode's caret is — a top-level block and the character
+   * offset in its text (`@dskripchenko/wysiwyg` 0.16+); null in the Markdown
+   * modes and when the editor has no focus.
+   */
+  caret: [position: CaretPosition | null]
 }>()
 
 const mode = defineModel<MarkdownEditorMode>('mode', { default: 'visual' })
@@ -94,13 +121,36 @@ const wysiwyg = ref<InstanceType<typeof DskWysiwyg> | null>(null)
 const inPlace = computed<Record<string, unknown>>(() => ({
   ...(props.bubble !== false ? { bubble: props.bubble } : {}),
   ...(props.frameless ? { frameless: true } : {}),
+  ...(props.bubbleActions?.length ? { bubbleActions: props.bubbleActions } : {}),
+  ...(props.blockHandles ? { blockHandles: true } : {}),
+  ...(props.remoteCarets?.length ? { remoteCarets: props.remoteCarets } : {}),
 }))
 const area = ref<HTMLTextAreaElement | null>(null)
 
+// A value from outside (another person's edit, say). The visual editor patches
+// it in and keeps its caret; the Markdown modes keep the field's selection,
+// shifted past the changed span.
 watch(() => props.modelValue, (next) => {
   if (next === markdown.value) return
+  const before = markdown.value
   markdown.value = next
   html.value = fromMarkdown(next, options.value)
+  const el = area.value
+  if (mode.value === 'visual' || !el || document.activeElement !== el) return
+  const start = shiftPosition(before, next, el.selectionStart)
+  const end = shiftPosition(before, next, el.selectionEnd)
+  const direction = el.selectionDirection
+  void nextTick(() => {
+    if (area.value === el) el.setSelectionRange(start, Math.max(start, end), direction ?? undefined)
+  })
+})
+
+// The caret is the visual editor's: the Markdown modes have none to report.
+function onCaret(position: CaretPosition | null): void {
+  if (mode.value === 'visual') emit('caret', position)
+}
+watch(mode, (next, previous) => {
+  if (previous === 'visual' && next !== 'visual') emit('caret', null)
 })
 
 // A new base (the document moved): draw the pictures from it.
@@ -353,6 +403,7 @@ defineExpose({ focus, insert, get value() { return markdown.value } })
         :locale="locale"
         @update:model-value="onHtml"
         @image-request="pickImages"
+        @caret="onCaret"
       />
     </div>
 

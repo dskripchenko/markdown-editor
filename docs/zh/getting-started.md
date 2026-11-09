@@ -43,6 +43,9 @@ const mode = ref('visual')
 | `toolbar` | `boolean` | 可视模式下文本上方的工具栏；格式由浮动工具栏或宿主提供时设为 `false`。默认 `true`。 |
 | `bubble` | `boolean \| string[]` | 可视模式下浮在选区上方的小型深色工具栏：`true` 为粗体、斜体、下划线、删除线、行内代码、链接、二级标题和无序列表，或指定要显示的项。需要 `@dskripchenko/wysiwyg` 0.15。 |
 | `frameless` | `boolean` | 无边框：可视编辑器、模式按钮、源码和预览都去掉边框和背景，透出周围的页面。可视编辑器需要 `@dskripchenko/wysiwyg` 0.15。 |
+| `bubbleActions` | `BubbleAction[]` | 可视模式浮动工具栏末尾的自定义按钮——每个带图标和文字；`run({ text, block })` 接收所选文本及其起点所在块的序号。需要 `@dskripchenko/wysiwyg` 0.16。 |
+| `blockHandles` | `boolean` | 可视模式中块旁边的「+」和「⋮⋮」拖柄：添加块、拖动块，或通过菜单移动、复制和删除块。需要 `@dskripchenko/wysiwyg` 0.16。 |
+| `remoteCarets` | `RemoteCaret[]` | 绘制在可视模式上方的其他人的光标（`{ id, name, color?, block, offset? }`）；Markdown 模式忽略它们。需要 `@dskripchenko/wysiwyg` 0.16。 |
 | `placeholder` | `string` | 文档为空时显示。 |
 | `readonly` | `boolean` | 所有模式下只读。 |
 | `min-height`、`max-height` | `string` | 编辑区高度。 |
@@ -61,6 +64,8 @@ TeX 公式（`$…$`、`$$…$$`）和 `==高亮==` 在可视模式下以渲染�
 
 事件：`update:modelValue` 和 `change`，参数为 Markdown——仅在编辑文档时触发，加载时不会。`update:mode`。
 
+`caret`，参数为 `{ block, offset }`——可视模式中光标的位置（顶层块及其文本中的字符偏移），最多每 100ms 一次——在 Markdown 模式中或没有焦点时为 `null`（`@dskripchenko/wysiwyg` 0.16）。
+
 对外提供：`focus()`、`insert(markdown)`（插入到光标处；可视模式下已格式化）、`value`。
 
 ## 原地编辑
@@ -72,6 +77,28 @@ TeX 公式（`$…$`、`$$…$$`）和 `==高亮==` 在可视模式下以渲染�
 ```
 
 工具条的外观通过编辑器的 `--dsk-wysiwyg-bubble-*` 变量设置。
+
+## 协同编辑
+
+实时协同编辑时，把 `caret` 事件发送给其他人，并把他们的光标通过 `remoteCarets`
+传回；他人带来的新 `v-model` 值会被接收，光标不会丢失：
+
+```vue
+<MarkdownEditor
+  v-model="text"
+  :remote-carets="others"
+  @caret="(pos) => channel.send({ caret: pos })"
+/>
+```
+
+- 在可视模式下，新值以补丁方式合入：只替换发生变化的块，位于其他块中的光标保持原位，
+  位于变化块中的光标按块和偏移恢复。撤销历史从新值重新开始，因此撤销永远不会撤回他人
+  的编辑。
+- 在 Markdown 模式下，文本框保留其选区：位于变化部分之前的选区保持不动，之后的选区随之
+  平移。
+- 他人的光标只在可视模式中绘制。
+
+这些功能需要 `@dskripchenko/wysiwyg` 0.16；使用旧版本时这些属性不起作用，也不会传给它。
 
 ## 往返转换
 
