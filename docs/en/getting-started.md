@@ -43,6 +43,9 @@ The switch shows the modes in `modes`; with one mode there is no switch.
 | `toolbar` | `boolean` | The visual mode's toolbar above the text; `false` when formatting comes from the bubble or the host. Default `true`. |
 | `bubble` | `boolean \| string[]` | A small dark toolbar floating above a selection in the visual mode: `true` for bold, italic, underline, strike, inline code, link, heading 2 and bullet list, or the toolbar items to show. Needs `@dskripchenko/wysiwyg` 0.15. |
 | `frameless` | `boolean` | No frame: the visual editor, the mode buttons, the source and the preview drop their borders and backgrounds, so the page around shows through. Needs `@dskripchenko/wysiwyg` 0.15 for the visual editor. |
+| `bubbleActions` | `BubbleAction[]` | Your own buttons at the end of the visual mode's bubble — an icon and a label each; `run({ text, block })` gets the selected text and the index of the block it starts in. Needs `@dskripchenko/wysiwyg` 0.16. |
+| `blockHandles` | `boolean` | A «+» and a «⋮⋮» grip beside the visual mode's blocks: add a block, drag one elsewhere, or move, duplicate and delete it from a menu. Needs `@dskripchenko/wysiwyg` 0.16. |
+| `remoteCarets` | `RemoteCaret[]` | Other people's carets drawn over the visual mode (`{ id, name, color?, block, offset? }`); the Markdown modes ignore them. Needs `@dskripchenko/wysiwyg` 0.16. |
 | `placeholder` | `string` | Shown while the document is empty. |
 | `readonly` | `boolean` | Read-only in every mode. |
 | `min-height`, `max-height` | `string` | The editing area's height. |
@@ -62,6 +65,8 @@ A YAML front matter at the start (the document's properties) is kept exactly as 
 Events: `update:modelValue` and `change` with the Markdown — only when the
 document is edited, never on loading it. `update:mode`.
 
+`caret` with `{ block, offset }` — where the visual mode's caret is (a top-level block and the character offset in its text), at most every 100ms — or `null` in the Markdown modes and without focus (`@dskripchenko/wysiwyg` 0.16).
+
 Exposed: `focus()`, `insert(markdown)` (at the caret; formatted in the visual
 mode), `value`.
 
@@ -76,6 +81,32 @@ from a bar over the selection:
 
 The bar's look is themed through the editor's `--dsk-wysiwyg-bubble-*`
 variables.
+
+## Co-editing
+
+For real-time co-editing, send the `caret` event to the others and pass
+theirs back as `remoteCarets`; a new `v-model` value from someone else is
+taken without losing the caret:
+
+```vue
+<MarkdownEditor
+  v-model="text"
+  :remote-carets="others"
+  @caret="(pos) => channel.send({ caret: pos })"
+/>
+```
+
+- In the visual mode the new value is patched in: only the blocks that
+  changed are replaced, a caret in another block stays where it is, one in a
+  changed block is put back by its block and offset. The editor's undo
+  history starts again from the new value, so an undo never takes back
+  someone else's edit.
+- In the Markdown modes the text field keeps its selection: a selection
+  before the changed span stays, one after it shifts with it.
+- Other people's carets are drawn in the visual mode only.
+
+These need `@dskripchenko/wysiwyg` 0.16; with an older one the props do
+nothing and are not passed to it.
 
 ## The round trip
 

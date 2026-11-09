@@ -40,6 +40,9 @@ const text = ref('# Release notes\n\nVersion **3.1**.')
   page or a document is cleaned by the editor's sanitizer.
 - Live blocks (```` ```mermaid ```` and others) through `blockRenderers` —
   the same renderers in the editor and in the preview.
+- **Co-editing** (with `@dskripchenko/wysiwyg` 0.16): a `caret` event,
+  other people's carets (`remoteCarets`), an outside value taken without
+  losing the caret, and block handles to add, drag and reorder blocks.
 - No runtime dependencies: Vue, [`@dskripchenko/ui`](https://github.com/dskripchenko/ui)
   and `@dskripchenko/wysiwyg` are peer dependencies. Russian and English.
 
